@@ -1,0 +1,885 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner | Digital Trust</title>
+
+    <style>
+        :root {
+            --bg: #f4f6fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #718096;
+            --primary: #4f46e5;
+            --border: #e7eaf1;
+            --sidebar: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar);
+            color: white;
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 19px;
+            font-weight: 800;
+            padding: 5px 12px 35px;
+        }
+
+        .brand span {
+            color: #818cf8;
+        }
+
+        .nav-label {
+            color: #8993a5;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 0 12px;
+            margin-bottom: 13px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            margin-bottom: 7px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #29334b;
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #818cf8;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            border-top: 1px solid #30394a;
+            padding-top: 18px;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 76px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 38px;
+        }
+
+        .topbar h2 {
+            font-size: 17px;
+        }
+
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .avatar {
+            width: 37px;
+            height: 37px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            color: #4338ca;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+
+        .content {
+            max-width: 1100px;
+            margin: auto;
+            padding: 38px;
+        }
+
+        .page-heading {
+            margin-bottom: 28px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            margin-bottom: 9px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .scanner-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(250px, 0.8fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 27px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.035);
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 23px;
+        }
+
+        .card-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            background: #eef2ff;
+            color: var(--primary);
+            border-radius: 11px;
+            font-size: 21px;
+        }
+
+        .card-heading h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .card-heading p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .upload-area {
+            border: 2px dashed #c7cce0;
+            border-radius: 12px;
+            padding: 30px 18px;
+            text-align: center;
+            background: #fafbff;
+            transition: 0.2s;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f5f6ff;
+        }
+
+        .upload-icon {
+            font-size: 39px;
+            margin-bottom: 12px;
+        }
+
+        .upload-area h4 {
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .upload-area p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .choose-btn {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 11px 19px;
+            border-radius: 8px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .preview-wrapper {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .preview-wrapper img {
+            max-width: 100%;
+            max-height: 240px;
+            object-fit: contain;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .file-name {
+            margin-top: 9px;
+            font-size: 12px;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .input-hint {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        .actions {
+            display: flex;
+            gap: 11px;
+            margin-top: 23px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 9px;
+            padding: 13px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
+
+        .btn-secondary {
+            background: #f1f3f8;
+            color: #475569;
+        }
+
+        .info-card {
+            background: #172554;
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .info-card h3 {
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+
+        .info-card > p {
+            color: #c7d2fe;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 23px;
+        }
+
+        .info-item {
+            display: flex;
+            gap: 13px;
+            margin-bottom: 21px;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #e0e7ff;
+        }
+
+        .info-number {
+            min-width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: rgba(165, 180, 252, 0.15);
+            color: #a5b4fc;
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .info-item strong {
+            color: white;
+            font-size: 13px;
+        }
+
+        .notice {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.09);
+            border-radius: 10px;
+            color: #c7d2fe;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .notice strong {
+            display: block;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .result-card {
+            margin-top: 25px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 27px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 23px;
+        }
+
+        .result-header h3 {
+            font-size: 18px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .status.safe {
+            color: #047857;
+            background: #d1fae5;
+        }
+
+        .status.suspicious {
+            color: #b91c1c;
+            background: #fee2e2;
+        }
+
+        .status.neutral {
+            color: #475569;
+            background: #e2e8f0;
+        }
+
+        .scanned-content {
+            padding: 15px;
+            background: #f8f9fc;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            margin-bottom: 20px;
+            overflow-wrap: anywhere;
+        }
+
+        .scanned-content small {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-bottom: 7px;
+            font-weight: 700;
+        }
+
+        .scanned-content p {
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 25px;
+        }
+
+        .metric {
+            background: #f8f9fc;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 18px;
+        }
+
+        .metric p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .metric h2 {
+            font-size: 25px;
+        }
+
+        .metric small {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .reasons {
+            margin-top: 24px;
+            border-top: 1px solid var(--border);
+            padding-top: 21px;
+        }
+
+        .reasons h4 {
+            font-size: 14px;
+            margin-bottom: 13px;
+        }
+
+        .reason-item {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 9px;
+        }
+
+        .model-note {
+            margin-top: 17px;
+            padding: 13px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 14px 16px;
+            border-radius: 9px;
+            color: #b91c1c;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            font-size: 13px;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 11px;
+            padding: 30px 10px;
+        }
+
+        @media(max-width: 900px) {
+            .sidebar { width: 205px; }
+            .scanner-grid { grid-template-columns: 1fr; }
+        }
+
+        @media(max-width: 650px) {
+            .sidebar { display: none; }
+            .content { padding: 22px 15px; }
+            .topbar { padding: 0 17px; }
+            .metrics { grid-template-columns: 1fr; }
+            .card { padding: 19px; }
+            .page-heading h1 { font-size: 23px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="sidebar">
+        <div class="brand">Digital<span>Trust.</span></div>
+        <div class="nav-label">WORKSPACE</div>
+
+        <a href="{% url 'home' %}" class="nav-link">
+            <span>▦</span> Dashboard
+        </a>
+
+        <a href="{% url 'message_scanner' %}" class="nav-link">
+            <span>✉</span> Message Scanner
+        </a>
+
+        <a href="{% url 'url_scanner' %}" class="nav-link">
+            <span>◎</span> URL Scanner
+        </a>
+
+        <a href="{% url 'qr_scanner' %}" class="nav-link active">
+            <span>▦</span> QR Scanner
+        </a>
+
+        <a href="{% url 'scan_history' %}" class="nav-link">
+            <span>◷</span> Scan History
+        </a>
+
+        <div class="sidebar-bottom">
+            <a href="{% url 'settings' %}" class="nav-link">
+                <span>⚙</span> Settings
+            </a>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <h2>QR Code Security Scanner</h2>
+
+            <a href="{% url 'profile' %}" class="profile-link">
+                <span class="avatar">
+                    {{ request.user.username|first|upper }}
+                </span>
+                <span>{{ request.user.username }}</span>
+            </a>
+        </header>
+
+        <section class="content">
+
+            <div class="page-heading">
+                <h1>QR Code Threat Analysis</h1>
+                <p>
+                    Upload a QR code image to extract its contents and
+                    analyze supported website addresses for suspicious
+                    characteristics.
+                </p>
+            </div>
+
+            <div class="scanner-grid">
+
+                <section class="card">
+
+                    <div class="card-heading">
+                        <div class="card-icon">▦</div>
+                        <div>
+                            <h3>Analyze a QR Code</h3>
+                            <p>Upload a clear QR code image.</p>
+                        </div>
+                    </div>
+
+                    <form
+                        method="POST"
+                        action="{% url 'qr_scanner' %}"
+                        enctype="multipart/form-data"
+                        id="qrForm"
+                    >
+                        {% csrf_token %}
+
+                        <label for="qr_image">QR Code Image</label>
+
+                        <div class="upload-area">
+                            <div class="upload-icon">▦</div>
+                            <h4>Upload your QR code</h4>
+                            <p>PNG, JPG or JPEG · Maximum 5 MB</p>
+
+                            <label for="qr_image" class="choose-btn">
+                                Choose Image
+                            </label>
+
+                            <input
+                                type="file"
+                                name="qr_image"
+                                id="qr_image"
+                                class="file-input"
+                                accept="image/png,image/jpeg,image/jpg"
+                                required
+                            >
+
+                            <div class="preview-wrapper" id="previewWrapper">
+                                <img id="imagePreview" alt="QR code preview">
+                                <p class="file-name" id="fileName"></p>
+                            </div>
+                        </div>
+
+                        <p class="input-hint">
+                            The image is processed locally by the QR decoder.
+                            Extracted URLs are analyzed without opening them.
+                        </p>
+
+                        <div class="actions">
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                id="scanButton"
+                            >
+                                Analyze QR Code →
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                onclick="clearQR()"
+                            >
+                                Clear
+                            </button>
+                        </div>
+                    </form>
+
+                    {% if error %}
+                        <div class="error">{{ error }}</div>
+                    {% endif %}
+
+                </section>
+
+                <aside class="info-card">
+
+                    <h3>QR Code Safety Guide</h3>
+                    <p>
+                        QR codes can contain links or text. Check their
+                        contents before taking action.
+                    </p>
+
+                    <div class="info-item">
+                        <span class="info-number">01</span>
+                        <div>
+                            <strong>Verify the Source</strong><br>
+                            Be cautious with QR codes from unknown posters,
+                            messages or websites.
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-number">02</span>
+                        <div>
+                            <strong>Inspect Extracted Links</strong><br>
+                            Check the domain carefully before visiting
+                            an unfamiliar website.
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-number">03</span>
+                        <div>
+                            <strong>Avoid Sensitive Requests</strong><br>
+                            Do not enter passwords or payment details
+                            through unexpected QR links.
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-number">04</span>
+                        <div>
+                            <strong>Verify Independently</strong><br>
+                            Use an organisation's official website
+                            when checking important requests.
+                        </div>
+                    </div>
+
+                    <div class="notice">
+                        <strong>Security Reminder</strong>
+                        A QR code can conceal its destination.
+                        A Safe assessment is not a guarantee that
+                        the destination is trustworthy.
+                    </div>
+
+                </aside>
+
+            </div>
+
+            {% if result %}
+            <section class="result-card">
+
+                <div class="result-header">
+                    <h3>QR Code Analysis Results</h3>
+
+                    {% if result.label == "Safe" %}
+                        <span class="status safe">✓ Safe indicators</span>
+                    {% elif result.label == "Suspicious" %}
+                        <span class="status suspicious">⚠ Suspicious</span>
+                    {% else %}
+                        <span class="status neutral">Not Assessed</span>
+                    {% endif %}
+                </div>
+
+                <div class="scanned-content">
+                    <small>EXTRACTED QR CONTENT</small>
+                    <p>{{ extracted_text }}</p>
+                </div>
+
+                {% if result.content_type == "URL" %}
+                <div class="metrics">
+
+                    <div class="metric">
+                        <p>Digital Trust Score</p>
+                        <h2>{{ result.trust_score }}<small> / 100</small></h2>
+                        <small>{{ result.risk_level }}</small>
+                    </div>
+
+                    <div class="metric">
+                        <p>Suspicious Probability</p>
+                        <h2>{% widthratio result.suspicious_probability 1 100 %}%</h2>
+                        <small>Estimated URL risk</small>
+                    </div>
+
+                    <div class="metric">
+                        <p>Model Confidence</p>
+                        <h2>N/A</h2>
+                        <small>Not applicable to heuristic-based detection</small>
+                    </div>
+
+                </div>
+
+                <div class="reasons">
+                    <h4>Detection Explanation</h4>
+                    {% for reason in result.reasons %}
+                        <div class="reason-item">{{ reason }}</div>
+                    {% empty %}
+                        <p class="model-note">
+                            No listed URL risk indicators were detected.
+                        </p>
+                    {% endfor %}
+                </div>
+
+                {% else %}
+                <div class="model-note">
+                    <strong>Content Assessment:</strong>
+                    This QR code does not contain a supported HTTP or HTTPS
+                    URL. Its content has been extracted, but it has not
+                    received a security assessment.
+                </div>
+                {% endif %}
+
+                {% if result.message %}
+                    <div class="model-note">
+                        <strong>Trust Score Explanation:</strong>
+                        {{ result.message }}
+                    </div>
+                {% endif %}
+
+                {% if result.model_note %}
+                    <div class="model-note">
+                        <strong>Model Information:</strong>
+                        {{ result.model_note }}
+                    </div>
+                {% endif %}
+
+                <div class="model-note">
+                    This is a preliminary automated assessment.
+                    The URL detector uses lexical indicators and does not
+                    perform a live website reputation lookup.
+                </div>
+
+            </section>
+            {% endif %}
+
+            <div class="footer">
+                AI-Powered Digital Trust and Cyber Threat Detection System
+            </div>
+
+        </section>
+    </main>
+</div>
+
+<script>
+    const fileInput = document.getElementById("qr_image");
+    const previewWrapper = document.getElementById("previewWrapper");
+    const imagePreview = document.getElementById("imagePreview");
+    const fileName = document.getElementById("fileName");
+
+    fileInput.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (!file) {
+            clearPreview();
+            return;
+        }
+
+        const allowedTypes = ["image/png", "image/jpeg"];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert("Please choose a PNG or JPEG image.");
+            this.value = "";
+            clearPreview();
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert("Image size must not exceed 5 MB.");
+            this.value = "";
+            clearPreview();
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            imagePreview.src = event.target.result;
+            fileName.textContent = file.name;
+            previewWrapper.style.display = "block";
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    function clearPreview() {
+        imagePreview.removeAttribute("src");
+        fileName.textContent = "";
+        previewWrapper.style.display = "none";
+    }
+
+    function clearQR() {
+        fileInput.value = "";
+        clearPreview();
+    }
+
+    document.getElementById("qrForm").addEventListener("submit", function (event) {
+        if (!fileInput.files.length) {
+            event.preventDefault();
+            alert("Please select a QR code image.");
+            return;
+        }
+
+        const button = document.getElementById("scanButton");
+        button.textContent = "Analyzing QR Code...";
+        button.disabled = true;
+    });
+</script>
+
+</body>
+</html>

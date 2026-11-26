@@ -1,0 +1,604 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Cyber Awareness Assistant</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            min-height: 100vh;
+            background: #111c35;
+            color: white;
+            padding: 28px 18px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 38px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 13px 14px;
+            border-radius: 9px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #263653;
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5eaf1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 35px;
+        }
+
+        .profile {
+            color: #263653;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .content {
+            max-width: 1050px;
+            margin: 35px auto;
+            padding: 0 25px;
+        }
+
+        .heading h1 {
+            font-size: 28px;
+            margin-bottom: 9px;
+        }
+
+        .heading p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .assistant-card {
+            background: white;
+            border: 1px solid #e5eaf1;
+            border-radius: 16px;
+            margin-top: 28px;
+            padding: 28px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+        }
+
+        .welcome {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .assistant-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            background: #e8efff;
+            color: #315bd6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+        }
+
+        .welcome h2 {
+            font-size: 19px;
+            margin-bottom: 5px;
+        }
+
+        .welcome p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .notice {
+            background: #f1f6ff;
+            border: 1px solid #dbe8ff;
+            padding: 15px;
+            border-radius: 10px;
+            color: #34518b;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .suggestions-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 13px;
+        }
+
+        .suggestions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .suggestion {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 16px;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            color: #334155;
+            font-size: 13px;
+            line-height: 1.5;
+            transition: 0.2s;
+        }
+
+        .suggestion:hover {
+            border-color: #5379e5;
+            background: #f8faff;
+        }
+
+        .suggestion span {
+            display: block;
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .chat-area {
+            margin-top: 28px;
+            border-top: 1px solid #e8edf4;
+            padding-top: 24px;
+        }
+
+        .chat-area label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .chat-input {
+            width: 100%;
+            min-height: 115px;
+            resize: vertical;
+            border: 1px solid #d8e0eb;
+            border-radius: 11px;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #5379e5;
+        }
+
+        .send-button {
+            margin-top: 14px;
+            background: #315bd6;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            padding: 13px 25px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .send-button:hover {
+            background: #2449b8;
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .response-box {
+            margin-top: 22px;
+            padding: 22px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 14px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .response-box h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #1e3a8a;
+        }
+
+        .response-answer {
+            color: #334155;
+            white-space: normal;
+            line-height: 1.8;
+        }
+
+        .response-answer p {
+            margin-bottom: 12px;
+        }
+
+        .response-answer ul,
+        .response-answer ol {
+            padding-left: 25px;
+            margin: 10px 0 15px;
+        }
+
+        .response-answer li {
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        .response-answer strong {
+            color: #172033;
+        }
+
+        .response-answer code {
+            background: #e9eef5;
+            padding: 2px 5px;
+            border-radius: 4px;
+        }
+
+        .error-box {
+            margin-top: 18px;
+            padding: 15px;
+            border-radius: 9px;
+            background: #fff1f2;
+            color: #be123c;
+            font-size: 13px;
+        }
+
+        .footer-note {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            margin: 25px 0;
+        }
+
+        @media (max-width: 750px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                min-height: auto;
+                padding: 15px;
+            }
+
+            .brand {
+                margin-bottom: 15px;
+            }
+
+            .sidebar a {
+                display: inline-block;
+                margin: 3px;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .suggestions {
+                grid-template-columns: 1fr;
+            }
+
+            .assistant-card {
+                padding: 18px;
+            }
+
+            .heading h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="brand">🛡️ Digital Trust</div>
+
+    <a href="{% url 'home' %}">Dashboard</a>
+    <a href="{% url 'message_scanner' %}">Message Scanner</a>
+    <a href="{% url 'url_scanner' %}">URL Scanner</a>
+    <a href="{% url 'qr_scanner' %}">QR Scanner</a>
+    <a href="{% url 'screenshot_scanner' %}">Screenshot Scanner</a>
+    <a href="{% url 'scan_history' %}">Scan History</a>
+    <a href="{% url 'cyber_assistant' %}" class="active">Cyber Awareness Assistant</a>
+    <a href="{% url 'settings' %}">Settings</a>
+
+</aside>
+
+<main class="main">
+
+    <header class="topbar">
+
+        <strong>Cyber Awareness Center</strong>
+
+        <a href="{% url 'profile' %}" class="profile">
+            {{ request.user.username }} ←
+        </a>
+
+    </header>
+
+    <section class="content">
+
+        <div class="heading">
+
+            <h1>AI Cyber Awareness Assistant</h1>
+
+            <p>
+                Your cybersecurity learning companion.
+                Understand online threats and learn safer digital practices.
+            </p>
+
+        </div>
+
+        <div class="assistant-card">
+
+            <div class="welcome">
+
+                <div class="assistant-icon">🤖</div>
+
+                <div>
+                    <h2>Welcome to Cyber Assistant</h2>
+                    <p>Ask questions about cybersecurity and online safety.</p>
+                </div>
+
+            </div>
+
+            <div class="notice">
+
+                <strong>Security Awareness:</strong>
+
+                Never share passwords, OTPs, banking details
+                or other confidential information in this assistant.
+
+            </div>
+
+            <div class="suggestions-title">
+                Suggested Questions
+            </div>
+
+            <div class="suggestions">
+
+                <button class="suggestion" type="button"
+                    onclick="selectQuestion('How can I identify a phishing message?')">
+
+                    <span>📩</span>
+                    How can I identify a phishing message?
+
+                </button>
+
+                <button class="suggestion" type="button"
+                    onclick="selectQuestion('How can I check whether a website is trustworthy?')">
+
+                    <span>🌐</span>
+                    How can I check whether a website is trustworthy?
+
+                </button>
+
+                <button class="suggestion" type="button"
+                    onclick="selectQuestion('What should I do if I receive a suspicious link?')">
+
+                    <span>🔗</span>
+                    What should I do if I receive a suspicious link?
+
+                </button>
+
+                <button class="suggestion" type="button"
+                    onclick="selectQuestion('How can I protect my online accounts?')">
+
+                    <span>🔐</span>
+                    How can I protect my online accounts?
+
+                </button>
+
+                <button class="suggestion" type="button"
+                    onclick="selectQuestion('What are the warning signs of a fake QR code?')">
+
+                    <span>📱</span>
+                    What are the warning signs of a fake QR code?
+
+                </button>
+
+                <button class="suggestion" type="button"
+                    onclick="selectQuestion('What is two-factor authentication?')">
+
+                    <span>🛡️</span>
+                    What is two-factor authentication?
+
+                </button>
+
+            </div>
+
+            <div class="chat-area">
+
+                <form method="POST" id="assistantForm">
+
+                    {% csrf_token %}
+
+                    <label for="question">
+                        Ask your cybersecurity question
+                    </label>
+
+                    <textarea
+                        class="chat-input"
+                        id="question"
+                        name="question"
+                        maxlength="1000"
+                        placeholder="Type your cybersecurity question here..."
+                        required>{{ question }}</textarea>
+
+                    <button
+                        type="submit"
+                        class="send-button"
+                        id="sendButton">
+
+                        Ask AI Assistant →
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            {% if answer %}
+
+            <div class="response-box">
+
+                <h3>🤖 AI Assistant Response</h3>
+
+                <div class="response-answer" id="aiAnswer"
+                    data-answer="{{ answer }}">
+                </div>
+
+            </div>
+
+            {% endif %}
+
+            {% if error %}
+
+            <div class="error-box">
+                {{ error }}
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        <div class="footer-note">
+            AI Cyber Awareness Assistant | Digital Trust and Cyber Threat Detection System
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+    function selectQuestion(question) {
+        document.getElementById("question").value = question;
+        document.getElementById("question").focus();
+    }
+
+    // Safely format basic Markdown without rendering model output as HTML.
+    function formatAIResponse(rawText) {
+
+        const escapeHTML = (text) => text.replace(/[&<>"']/g, char => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[char]);
+
+        let text = escapeHTML(rawText || "");
+
+        text = text.replace(/\\\*\\\*(.*?)\\\*\\\*/g, "<strong>$1</strong>");
+        text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+        text = text.replace(/\\\*(.*?)\\\*/g, "<em>$1</em>");
+        text = text.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+        const lines = text.split(/\r?\n/);
+        let output = "";
+        let inList = false;
+        let listType = "";
+
+        function closeList() {
+            if (inList) {
+                output += listType === "ol" ? "</ol>" : "</ul>";
+                inList = false;
+                listType = "";
+            }
+        }
+
+        for (const line of lines) {
+
+            const trimmed = line.trim();
+
+            if (!trimmed) {
+                closeList();
+                continue;
+            }
+
+            const numbered = trimmed.match(/^\d+[\.)]\s+(.+)$/);
+            const bullet = trimmed.match(/^[-*]\s+(.+)$/);
+
+            if (numbered || bullet) {
+
+                const type = numbered ? "ol" : "ul";
+
+                if (!inList || listType !== type) {
+                    closeList();
+                    output += type === "ol" ? "<ol>" : "<ul>";
+                    inList = true;
+                    listType = type;
+                }
+
+                output += "<li>" + (numbered ? numbered[1] : bullet[1]) + "</li>";
+
+            } else {
+
+                closeList();
+                output += "<p>" + trimmed + "</p>";
+
+            }
+        }
+
+        closeList();
+
+        return output;
+    }
+
+    const aiAnswer = document.getElementById("aiAnswer");
+
+    if (aiAnswer) {
+        aiAnswer.innerHTML = formatAIResponse(
+            aiAnswer.getAttribute("data-answer")
+        );
+    }
+
+    document.getElementById("assistantForm").addEventListener("submit", function() {
+        const button = document.getElementById("sendButton");
+        button.disabled = true;
+        button.textContent = "Generating response...";
+    });
+</script>
+
+</body>
+</html>

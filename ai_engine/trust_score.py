@@ -1,34 +1,100 @@
-"""Combine message and URL detection results into a digital trust score."""
-def calculate_trust_score(message_result=None, url_result=None) -> dict:
-    """Calculate a 0-100 score (higher means lower detected risk).
 
-    Inputs are dictionaries returned by detect_message() and detect_url().
-    Either input may be omitted. If both are omitted, score is 100.
-    """
+"""Digital Trust Score calculation module.
+
+Combines message and URL detection results into an
+explainable score from 0 to 100.
+"""
+
+
+def calculate_trust_score(message_result=None, url_result=None) -> dict:
+
     risks = []
+
     if message_result is not None:
-        risks.append(("message", float(message_result["suspicious_probability"]), 0.5))
+        if "suspicious_probability" not in message_result:
+            raise ValueError("Message result is missing suspicious_probability.")
+
+        message_risk = float(message_result["suspicious_probability"])
+
+        if not 0 <= message_risk <= 1:
+            raise ValueError("Message risk must be between 0 and 1.")
+
+        risks.append({
+            "name": "message",
+            "risk": message_risk,
+            "weight": 0.5
+        })
+
     if url_result is not None:
-        risks.append(("url", float(url_result["suspicious_probability"]), 0.5))
+        if "suspicious_probability" not in url_result:
+            raise ValueError("URL result is missing suspicious_probability.")
+
+        url_risk = float(url_result["suspicious_probability"])
+
+        if not 0 <= url_risk <= 1:
+            raise ValueError("URL risk must be between 0 and 1.")
+
+        risks.append({
+            "name": "url",
+            "risk": url_risk,
+            "weight": 0.5
+        })
 
     if not risks:
-        return {"trust_score": 100, "risk_level": "Low Risk",
-                "risk_probability": 0.0, "breakdown": {}}
+        return {
+            "trust_score": 100,
+            "risk_level": "Low Risk",
+            "risk_probability": 0.0,
+            "breakdown": {},
+            "contributions": {},
+            "message": "No scan results available."
+        }
 
-    total_weight = sum(weight for _, _, weight in risks)
-    risk = sum(prob * weight for _, prob, weight in risks) / total_weight
-    score = round((1 - risk) * 100)
+    total_weight = sum(item["weight"] for item in risks)
 
-    if score >= 80:
-        level = "Low Risk"
-    elif score >= 50:
-        level = "Medium Risk"
+    combined_risk = sum(
+        item["risk"] * item["weight"]
+        for item in risks
+    ) / total_weight
+
+    trust_score = round((1 - combined_risk) * 100)
+
+    if trust_score >= 80:
+        risk_level = "Low Risk"
+    elif trust_score >= 50:
+        risk_level = "Medium Risk"
     else:
-        level = "High Risk"
+        risk_level = "High Risk"
+
+    breakdown = {
+        item["name"]: round(item["risk"], 4)
+        for item in risks
+    }
+
+    contributions = {
+        item["name"]: round((1 - item["risk"]) * 100, 2)
+        for item in risks
+    }
+
+    if len(risks) == 2:
+        explanation = (
+            "The final trust score combines message and URL "
+            "risk estimates with equal weights."
+        )
+    elif risks[0]["name"] == "message":
+        explanation = (
+            "The trust score uses the message risk estimate."
+        )
+    else:
+        explanation = (
+            "The trust score uses the URL risk estimate."
+        )
 
     return {
-        "trust_score": score,
-        "risk_level": level,
-        "risk_probability": round(risk, 4),
-        "breakdown": {name: round(prob, 4) for name, prob, _ in risks}
+        "trust_score": trust_score,
+        "risk_level": risk_level,
+        "risk_probability": round(combined_risk, 4),
+        "breakdown": breakdown,
+        "contributions": contributions,
+        "message": explanation
     }

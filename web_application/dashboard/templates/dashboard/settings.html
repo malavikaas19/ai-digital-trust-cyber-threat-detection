@@ -1,0 +1,959 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | Digital Trust</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: #f4f6fc;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #77839a;
+            --primary: #6558e8;
+            --border: #e9edf5;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        .sidebar {
+            width: 255px;
+            height: 100vh;
+            position: fixed;
+            background: #10172a;
+            padding: 25px 17px;
+            color: white;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 21px;
+            font-weight: 800;
+            padding: 10px;
+            margin-bottom: 35px;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #9188ff;
+        }
+
+        .logo small {
+            display: block;
+            font-size: 11px;
+            font-weight: normal;
+            color: #9aa7c0;
+            margin-top: 5px;
+        }
+
+        .nav-heading {
+            color: #7886a3;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            margin: 25px 12px 12px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #c1cbe0;
+            text-decoration: none;
+            padding: 13px 12px;
+            border-radius: 9px;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #302d63;
+            color: white;
+        }
+
+        .logout-link {
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            color: #ffaaaa;
+            padding: 13px 12px;
+            border-radius: 9px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .logout-link:hover {
+            background: #642b3b;
+            color: white;
+        }
+
+        .main {
+            margin-left: 255px;
+            padding: 32px 38px;
+            max-width: 1450px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .topbar h1 {
+            font-size: 27px;
+            margin-bottom: 7px;
+        }
+
+        .topbar p {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 9px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .avatar {
+            height: 34px;
+            width: 34px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-banner {
+            background: linear-gradient(115deg, #25205f, #5549c9, #7669ed);
+            padding: 27px 30px;
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .settings-banner h2 {
+            font-size: 21px;
+            margin-bottom: 8px;
+        }
+
+        .settings-banner p {
+            font-size: 13px;
+            color: #e0e1ff;
+            line-height: 1.6;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .settings-menu,
+        .settings-content {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+        }
+
+        .settings-menu {
+            padding: 13px;
+        }
+
+        .settings-menu a {
+            display: block;
+            padding: 13px;
+            border-radius: 8px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .settings-menu a.active,
+        .settings-menu a:hover {
+            background: #eeeaff;
+            color: #5144c9;
+            font-weight: bold;
+        }
+
+        .settings-content {
+            padding: 26px;
+        }
+
+        .settings-section {
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-heading {
+            margin-bottom: 7px;
+            font-size: 16px;
+        }
+
+        .section-description {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 19px;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 13px;
+        }
+
+        .theme-option {
+            border: 2px solid var(--border);
+            border-radius: 11px;
+            padding: 10px;
+            cursor: pointer;
+            background: var(--surface);
+            text-align: left;
+            color: var(--text);
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .theme-option:hover {
+            border-color: #aaa0ff;
+        }
+
+        .theme-option.selected {
+            border-color: var(--primary);
+            background: #f4f1ff;
+        }
+
+        .theme-preview {
+            height: 75px;
+            border-radius: 7px;
+            margin-bottom: 11px;
+            padding: 10px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .preview-sidebar {
+            width: 25%;
+            border-radius: 4px;
+        }
+
+        .preview-content {
+            flex: 1;
+            border-radius: 4px;
+            padding: 7px;
+        }
+
+        .preview-line {
+            height: 6px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            opacity: 0.7;
+        }
+
+        .light-preview {
+            background: #e8ecf5;
+        }
+
+        .light-preview .preview-sidebar {
+            background: #172033;
+        }
+
+        .light-preview .preview-content {
+            background: white;
+        }
+
+        .light-preview .preview-line {
+            background: #b5bfd0;
+        }
+
+        .dark-preview {
+            background: #090f1f;
+        }
+
+        .dark-preview .preview-sidebar {
+            background: #202b42;
+        }
+
+        .dark-preview .preview-content {
+            background: #182237;
+        }
+
+        .dark-preview .preview-line {
+            background: #71809b;
+        }
+
+        .blue-preview {
+            background: #dcecff;
+        }
+
+        .blue-preview .preview-sidebar {
+            background: #123b69;
+        }
+
+        .blue-preview .preview-content {
+            background: #f1f7ff;
+        }
+
+        .blue-preview .preview-line {
+            background: #8bb9ee;
+        }
+
+        .theme-option strong {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .theme-option small {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .colour-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 13px;
+        }
+
+        .colour-option {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 3px solid white;
+            outline: 1px solid #d4d9e5;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .colour-option.selected {
+            outline: 3px solid #202033;
+            transform: scale(1.08);
+        }
+
+        .custom-colour {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-top: 17px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .custom-colour input {
+            width: 43px;
+            height: 35px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .preference-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .preference-row:last-child {
+            border-bottom: none;
+        }
+
+        .preference-row strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .preference-row small {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .status-pill {
+            display: inline-block;
+            background: #e5f8ed;
+            color: #16834d;
+            border-radius: 20px;
+            padding: 6px 11px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .save-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding-top: 20px;
+        }
+
+        .save-message {
+            color: #16834d;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .save-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 21px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+        .reset-btn {
+            background: #f0f1f5;
+            color: #4b5563;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .security-note {
+            background: #f5f7ff;
+            border: 1px solid #e2e6ff;
+            padding: 15px;
+            border-radius: 9px;
+            color: #59627a;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        @media(max-width: 900px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-menu {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+            .settings-menu a {
+                margin: 3px;
+            }
+        }
+
+        @media(max-width: 550px) {
+            .theme-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<aside class="sidebar">
+
+    <div class="logo">
+        DIGITAL <span>TRUST</span>
+        <small>AI Cyber Threat Intelligence</small>
+    </div>
+
+    <div class="nav-heading">WORKSPACE</div>
+
+    <a href="{% url 'home' %}">▦ &nbsp; Dashboard</a>
+    <a href="{% url 'message_scanner' %}">✉ &nbsp; Message Scanner</a>
+    <a href="{% url 'url_scanner' %}">↗ &nbsp; URL Scanner</a>
+    <a href="{% url 'qr_scanner' %}">▦ &nbsp; QR Scanner</a>
+    <a href="{% url 'screenshot_scanner' %}">▧ &nbsp; Screenshot Scanner</a>
+    <a href="{% url 'cyber_assistant' %}">🤖 &nbsp; AI Cyber Assistant</a>
+    <a href="{% url 'scan_history' %}">◷ &nbsp; Scan History</a>
+
+    <div class="nav-heading">PREFERENCES</div>
+
+    <a href="{% url 'settings' %}" class="active">⚙ &nbsp; Settings</a>
+
+    <div class="nav-heading">ACCOUNT</div>
+
+    <a href="{% url 'profile' %}">◉ &nbsp; My Profile</a>
+
+    <form action="{% url 'logout' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="logout-link">
+            ↪ &nbsp; Logout
+        </button>
+    </form>
+
+</aside>
+
+
+<main class="main">
+
+    <div class="topbar">
+
+        <div>
+            <h1>Settings</h1>
+            <p>Personalize your Digital Trust workspace.</p>
+        </div>
+
+        <a href="{% url 'profile' %}" class="profile-link">
+            <div class="avatar">
+                {{ request.user.username|first|upper }}
+            </div>
+            {{ request.user.username }}
+        </a>
+
+    </div>
+
+
+    <section class="settings-banner">
+        <h2>Make your workspace yours.</h2>
+        <p>
+            Customize the appearance and interface of your cybersecurity
+            dashboard. Your saved preferences will be applied to this browser.
+        </p>
+    </section>
+
+
+    <div class="settings-layout">
+
+        <nav class="settings-menu">
+            <a href="#appearance" class="active">🎨 &nbsp; Appearance</a>
+            <a href="#colours">🖌️ &nbsp; Accent Colours</a>
+            <a href="#preferences">⚙️ &nbsp; Preferences</a>
+            <a href="#security">🛡️ &nbsp; Security</a>
+        </nav>
+
+
+        <section class="settings-content">
+
+            <!-- APPEARANCE -->
+
+            <div class="settings-section" id="appearance">
+
+                <h3 class="section-heading">Appearance</h3>
+
+                <p class="section-description">
+                    Choose the visual theme for your workspace.
+                </p>
+
+                <div class="theme-grid">
+
+                    <button type="button"
+                            class="theme-option"
+                            data-theme="light">
+
+                        <div class="theme-preview light-preview">
+                            <div class="preview-sidebar"></div>
+                            <div class="preview-content">
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                            </div>
+                        </div>
+
+                        <strong>Light Mode</strong>
+                        <small>Bright and clean interface</small>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="theme-option"
+                            data-theme="dark">
+
+                        <div class="theme-preview dark-preview">
+                            <div class="preview-sidebar"></div>
+                            <div class="preview-content">
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                            </div>
+                        </div>
+
+                        <strong>Dark Mode</strong>
+                        <small>Low-light interface</small>
+
+                    </button>
+
+
+                    <button type="button"
+                            class="theme-option"
+                            data-theme="blue">
+
+                        <div class="theme-preview blue-preview">
+                            <div class="preview-sidebar"></div>
+                            <div class="preview-content">
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                                <div class="preview-line"></div>
+                            </div>
+                        </div>
+
+                        <strong>Blue Mode</strong>
+                        <small>Blue security workspace</small>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCENT COLOURS -->
+
+            <div class="settings-section" id="colours">
+
+                <h3 class="section-heading">Accent Colour</h3>
+
+                <p class="section-description">
+                    Choose the highlight colour used by the interface.
+                </p>
+
+                <div class="colour-grid">
+
+                    <button type="button" class="colour-option selected"
+                            data-colour="#6558e8"
+                            style="background:#6558e8;"
+                            aria-label="Purple"></button>
+
+                    <button type="button" class="colour-option"
+                            data-colour="#2563eb"
+                            style="background:#2563eb;"
+                            aria-label="Blue"></button>
+
+                    <button type="button" class="colour-option"
+                            data-colour="#0891b2"
+                            style="background:#0891b2;"
+                            aria-label="Cyan"></button>
+
+                    <button type="button" class="colour-option"
+                            data-colour="#059669"
+                            style="background:#059669;"
+                            aria-label="Green"></button>
+
+                    <button type="button" class="colour-option"
+                            data-colour="#db2777"
+                            style="background:#db2777;"
+                            aria-label="Pink"></button>
+
+                    <button type="button" class="colour-option"
+                            data-colour="#ea580c"
+                            style="background:#ea580c;"
+                            aria-label="Orange"></button>
+
+                    <button type="button" class="colour-option"
+                            data-colour="#dc2626"
+                            style="background:#dc2626;"
+                            aria-label="Red"></button>
+
+                </div>
+
+                <div class="custom-colour">
+                    <span>Custom colour</span>
+                    <input type="color" id="customColour" value="#6558e8">
+                </div>
+
+            </div>
+
+
+            <!-- PREFERENCES -->
+
+            <div class="settings-section" id="preferences">
+
+                <h3 class="section-heading">Interface Preferences</h3>
+
+                <p class="section-description">
+                    Review your workspace and account settings.
+                </p>
+
+                <div class="preference-row">
+                    <div>
+                        <strong>Personalized workspace</strong>
+                        <small>Your dashboard displays your account's scan statistics.</small>
+                    </div>
+                    <span class="status-pill">ENABLED</span>
+                </div>
+
+                <div class="preference-row">
+                    <div>
+                        <strong>AI Cyber Assistant</strong>
+                        <small>Available from the main navigation.</small>
+                    </div>
+                    <span class="status-pill">AVAILABLE</span>
+                </div>
+
+                <div class="preference-row">
+                    <div>
+                        <strong>Scan history</strong>
+                        <small>Access your previous scan reports from the sidebar.</small>
+                    </div>
+                    <span class="status-pill">AVAILABLE</span>
+                </div>
+
+            </div>
+
+
+            <!-- SECURITY -->
+
+            <div class="settings-section" id="security">
+
+                <h3 class="section-heading">Security & Account</h3>
+
+                <p class="section-description">
+                    Information about your current account session.
+                </p>
+
+                <div class="preference-row">
+                    <div>
+                        <strong>Signed-in account</strong>
+                        <small>{{ request.user.username }}</small>
+                    </div>
+                    <span class="status-pill">ACTIVE</span>
+                </div>
+
+                <div class="preference-row">
+                    <div>
+                        <strong>Authentication</strong>
+                        <small>You are signed in to your Digital Trust account.</small>
+                    </div>
+                    <span class="status-pill">SIGNED IN</span>
+                </div>
+
+                <div class="security-note">
+                    <strong>Security reminder</strong><br>
+                    Never share your password or OTP with anyone.
+                    Always log out when using a shared computer.
+                </div>
+
+            </div>
+
+
+            <!-- SAVE -->
+
+            <div class="save-area">
+
+                <div>
+                    <div class="save-message" id="saveMessage"></div>
+                </div>
+
+                <div style="display:flex;gap:10px;">
+
+                    <button type="button"
+                            class="reset-btn"
+                            id="resetBtn">
+                        Reset
+                    </button>
+
+                    <button type="button"
+                            class="save-btn"
+                            id="saveBtn">
+                        Save Preferences
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    const defaultSettings = {
+        theme: "light",
+        primary: "#6558e8"
+    };
+
+    let selectedTheme = defaultSettings.theme;
+    let selectedColour = defaultSettings.primary;
+
+    const themeButtons = document.querySelectorAll(".theme-option");
+    const colourButtons = document.querySelectorAll(".colour-option");
+    const customColour = document.getElementById("customColour");
+    const saveMessage = document.getElementById("saveMessage");
+
+    function updateThemeSelection() {
+
+        themeButtons.forEach(button => {
+            button.classList.toggle(
+                "selected",
+                button.dataset.theme === selectedTheme
+            );
+        });
+
+    }
+
+    function updateColourSelection() {
+
+        colourButtons.forEach(button => {
+            button.classList.toggle(
+                "selected",
+                button.dataset.colour === selectedColour
+            );
+        });
+
+        customColour.value = selectedColour;
+
+    }
+
+    function loadSettings() {
+
+        const saved = localStorage.getItem("digitalTrustSettings");
+
+        if (saved) {
+
+            try {
+
+                const settings = JSON.parse(saved);
+
+                selectedTheme = settings.theme || "light";
+                selectedColour = settings.primary || "#6558e8";
+
+            } catch (error) {
+
+                selectedTheme = "light";
+                selectedColour = "#6558e8";
+
+            }
+
+        }
+
+        updateThemeSelection();
+        updateColourSelection();
+
+    }
+
+    themeButtons.forEach(button => {
+
+        button.addEventListener("click", function() {
+
+            selectedTheme = this.dataset.theme;
+
+            updateThemeSelection();
+
+            saveMessage.textContent = "Theme selected. Save to apply.";
+
+        });
+
+    });
+
+    colourButtons.forEach(button => {
+
+        button.addEventListener("click", function() {
+
+            selectedColour = this.dataset.colour;
+
+            updateColourSelection();
+
+            saveMessage.textContent = "Colour selected. Save to apply.";
+
+        });
+
+    });
+
+    customColour.addEventListener("input", function() {
+
+        selectedColour = this.value;
+
+        updateColourSelection();
+
+        saveMessage.textContent = "Custom colour selected. Save to apply.";
+
+    });
+
+    document.getElementById("saveBtn").addEventListener("click", function() {
+
+        const settings = {
+            theme: selectedTheme,
+            primary: selectedColour
+        };
+
+        localStorage.setItem(
+            "digitalTrustSettings",
+            JSON.stringify(settings)
+        );
+
+        saveMessage.textContent = "✓ Preferences saved successfully.";
+
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", function() {
+
+        selectedTheme = defaultSettings.theme;
+        selectedColour = defaultSettings.primary;
+
+        updateThemeSelection();
+        updateColourSelection();
+
+        localStorage.removeItem("digitalTrustSettings");
+
+        saveMessage.textContent = "Preferences reset to default.";
+
+    });
+
+    loadSettings();
+
+</script>
+
+</body>
+</html>

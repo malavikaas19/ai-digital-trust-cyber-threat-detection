@@ -1,0 +1,899 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Trust | Security Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: #f4f6fc;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #77839a;
+            --primary: #6558e8;
+            --sidebar: #10172a;
+            --border: #e9edf5;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--background);
+            color: var(--text);
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 255px;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--sidebar);
+            color: white;
+            padding: 25px 17px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 21px;
+            font-weight: 800;
+            padding: 10px;
+            margin-bottom: 35px;
+            letter-spacing: 1px;
+        }
+
+        .logo span {
+            color: #9188ff;
+        }
+
+        .logo small {
+            display: block;
+            color: #9aa7c0;
+            font-size: 11px;
+            font-weight: normal;
+            letter-spacing: 0;
+            margin-top: 5px;
+        }
+
+        .nav-heading {
+            color: #7886a3;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            margin: 25px 12px 12px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #c1cbe0;
+            text-decoration: none;
+            padding: 13px 12px;
+            border-radius: 9px;
+            margin-bottom: 5px;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #302d63;
+            color: white;
+        }
+
+        .logout-link {
+            width: 100%;
+            text-align: left;
+            background: transparent;
+            border: none;
+            color: #ffaaaa;
+            padding: 13px 12px;
+            border-radius: 9px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .logout-link:hover {
+            background: #642b3b;
+            color: white;
+        }
+
+        /* MAIN CONTENT */
+
+        .main {
+            margin-left: 255px;
+            padding: 30px 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            gap: 15px;
+        }
+
+        .topbar h1 {
+            font-size: 25px;
+            margin-bottom: 6px;
+        }
+
+        .topbar p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--surface);
+            padding: 9px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #6558e8;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* WELCOME BANNER */
+
+        .welcome-banner {
+            background: linear-gradient(115deg, #25205f, #5549c9, #7669ed);
+            color: white;
+            border-radius: 17px;
+            padding: 30px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner h2 {
+            font-size: 23px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-banner p {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #e0e1ff;
+            max-width: 600px;
+        }
+
+        .banner-tag {
+            display: inline-block;
+            margin-top: 17px;
+            background: rgba(255,255,255,0.16);
+            padding: 8px 13px;
+            border-radius: 20px;
+            font-size: 11px;
+        }
+
+        /* SECTION HEADINGS */
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 17px;
+        }
+
+        .section-heading h2 {
+            font-size: 17px;
+        }
+
+        .section-heading span {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* STATISTICS */
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 19px;
+            box-shadow: 0 4px 15px rgba(30,40,80,0.025);
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .stat-icon {
+            width: 39px;
+            height: 39px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            font-size: 19px;
+        }
+
+        .purple { background: #eeeaff; }
+        .blue { background: #e6f3ff; }
+        .green { background: #e4f8ee; }
+        .orange { background: #fff0df; }
+        .red { background: #ffe8e8; }
+
+        .stat-card p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-bottom: 9px;
+        }
+
+        .stat-card h3 {
+            font-size: 26px;
+            font-weight: 750;
+        }
+
+        /* SCANNER CARDS */
+
+        .scanner-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .scanner-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 21px;
+            transition: 0.2s;
+        }
+
+        .scanner-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 23px rgba(30,40,80,0.07);
+        }
+
+        .scanner-icon {
+            font-size: 25px;
+            margin-bottom: 14px;
+        }
+
+        .scanner-card h3 {
+            font-size: 15px;
+            margin-bottom: 9px;
+        }
+
+        .scanner-card p {
+            font-size: 12px;
+            line-height: 1.7;
+            color: var(--muted);
+            min-height: 61px;
+            margin-bottom: 16px;
+        }
+
+        .open-btn {
+            display: inline-block;
+            background: #eeeaff;
+            color: #5144c9;
+            padding: 9px 12px;
+            border-radius: 7px;
+            text-decoration: none;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .open-btn:hover {
+            background: #6558e8;
+            color: white;
+        }
+
+        .ai-card {
+            background: linear-gradient(145deg, #f0edff, #ffffff);
+            border-color: #d9d1ff;
+        }
+
+        .ai-tag {
+            display: inline-block;
+            color: #5946c9;
+            background: #e5dfff;
+            padding: 5px 9px;
+            border-radius: 15px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        /* CHARTS */
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .chart-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 23px;
+            min-width: 0;
+        }
+
+        .chart-card h3 {
+            font-size: 15px;
+            margin-bottom: 7px;
+        }
+
+        .chart-card .chart-subtitle {
+            color: var(--muted);
+            font-size: 11px;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            height: 270px;
+            position: relative;
+        }
+
+        .chart-note {
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 11px;
+            padding: 30px 0 10px;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 1150px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .scanner-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 850px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 550px) {
+            .stats-grid,
+            .scanner-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+    <div class="logo">
+        DIGITAL <span>TRUST</span>
+        <small>AI Cyber Threat Intelligence</small>
+    </div>
+
+    <div class="nav-heading">WORKSPACE</div>
+
+    <a href="{% url 'home' %}" class="active">▦ &nbsp; Dashboard</a>
+    <a href="{% url 'message_scanner' %}">✉ &nbsp; Message Scanner</a>
+    <a href="{% url 'url_scanner' %}">↗ &nbsp; URL Scanner</a>
+    <a href="{% url 'qr_scanner' %}">▦ &nbsp; QR Scanner</a>
+    <a href="{% url 'screenshot_scanner' %}">▧ &nbsp; Screenshot Scanner</a>
+    <a href="{% url 'cyber_assistant' %}">🤖 &nbsp; AI Cyber Assistant</a>
+    <a href="{% url 'scan_history' %}">◷ &nbsp; Scan History</a>
+
+    <div class="nav-heading">PREFERENCES</div>
+
+    <a href="{% url 'settings' %}">⚙ &nbsp; Settings</a>
+
+    <div class="nav-heading">ACCOUNT</div>
+
+    <a href="{% url 'profile' %}">◉ &nbsp; My Profile</a>
+
+    <form action="{% url 'logout' %}" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="logout-link">
+            ↪ &nbsp; Logout
+        </button>
+    </form>
+
+</aside>
+
+
+<!-- MAIN DASHBOARD -->
+
+<main class="main">
+
+    <div class="topbar">
+
+        <div>
+            <h1>Security Dashboard</h1>
+            <p>Monitor, analyze and understand your digital security.</p>
+        </div>
+
+        <a href="{% url 'profile' %}" class="profile-link">
+            <div class="avatar">
+                {{ request.user.username|first|upper }}
+            </div>
+            {{ request.user.username }}
+        </a>
+
+    </div>
+
+
+    <!-- WELCOME BANNER -->
+
+    <section class="welcome-banner">
+
+        <h2>Welcome back, {{ request.user.username }}!</h2>
+
+        <p>
+            Your digital security command centre is ready.
+            Analyze suspicious messages, websites, QR codes and
+            screenshots, and learn about online threats with AI assistance.
+        </p>
+
+        <span class="banner-tag">
+            ✦ AI-POWERED DIGITAL TRUST PLATFORM
+        </span>
+
+    </section>
+
+
+    <!-- STATISTICS -->
+
+    <div class="section-heading">
+        <h2>Platform Overview</h2>
+        <span>All-time scan statistics</span>
+    </div>
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <div class="stat-icon purple">🛡️</div>
+            </div>
+            <p>Total Scans</p>
+            <h3>{{ total_scans }}</h3>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <div class="stat-icon blue">✉️</div>
+            </div>
+            <p>Message Scans</p>
+            <h3>{{ message_scans }}</h3>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <div class="stat-icon green">🔗</div>
+            </div>
+            <p>URL Scans</p>
+            <h3>{{ url_scans }}</h3>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <div class="stat-icon orange">▦</div>
+            </div>
+            <p>QR Code Scans</p>
+            <h3>{{ qr_scans }}</h3>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <div class="stat-icon purple">🖼️</div>
+            </div>
+            <p>Screenshot Scans</p>
+            <h3>{{ screenshot_scans }}</h3>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <div class="stat-icon green">✓</div>
+            </div>
+            <p>Safe Results</p>
+            <h3>{{ safe_scans }}</h3>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <div class="stat-icon red">⚠️</div>
+            </div>
+            <p>Suspicious Results</p>
+            <h3>{{ suspicious_scans }}</h3>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-top">
+                <div class="stat-icon orange">🚨</div>
+            </div>
+            <p>High Risk Scans</p>
+            <h3>{{ high_risk_scans }}</h3>
+        </div>
+
+    </div>
+
+
+    <!-- SCANNERS -->
+
+    <div class="section-heading">
+        <h2>Security Intelligence Tools</h2>
+        <span>Choose a tool to get started</span>
+    </div>
+
+    <div class="scanner-grid">
+
+        <div class="scanner-card">
+            <div class="scanner-icon">✉️</div>
+            <h3>Message Scanner</h3>
+            <p>
+                Examine messages for possible phishing language,
+                suspicious requests and misleading content.
+            </p>
+            <a href="{% url 'message_scanner' %}" class="open-btn">
+                Launch Scanner →
+            </a>
+        </div>
+
+        <div class="scanner-card">
+            <div class="scanner-icon">🔗</div>
+            <h3>URL Scanner</h3>
+            <p>
+                Examine website addresses for suspicious patterns
+                and potential online threats.
+            </p>
+            <a href="{% url 'url_scanner' %}" class="open-btn">
+                Launch Scanner →
+            </a>
+        </div>
+
+        <div class="scanner-card">
+            <div class="scanner-icon">▦</div>
+            <h3>QR Code Scanner</h3>
+            <p>
+                Extract QR code contents and inspect supported
+                links without automatically opening them.
+            </p>
+            <a href="{% url 'qr_scanner' %}" class="open-btn">
+                Launch Scanner →
+            </a>
+        </div>
+
+        <div class="scanner-card">
+            <div class="scanner-icon">🖼️</div>
+            <h3>Screenshot Scanner</h3>
+            <p>
+                Extract screenshot text and examine potential
+                phishing warning signs.
+            </p>
+            <a href="{% url 'screenshot_scanner' %}" class="open-btn">
+                Launch Scanner →
+            </a>
+        </div>
+
+        <div class="scanner-card ai-card">
+            <div class="scanner-icon">🤖</div>
+            <span class="ai-tag">AI POWERED</span>
+            <h3>AI Cyber Awareness Assistant</h3>
+            <p>
+                Ask cybersecurity questions and learn about
+                phishing, password safety and online protection.
+            </p>
+            <a href="{% url 'cyber_assistant' %}" class="open-btn">
+                Chat with AI →
+            </a>
+        </div>
+
+    </div>
+
+
+    <!-- ANALYTICS -->
+
+    <div class="section-heading">
+        <h2>Security Analytics</h2>
+        <span>Visual overview of your scans</span>
+    </div>
+
+    <div class="charts-grid">
+
+        <div class="chart-card">
+
+            <h3>Scan Result Distribution</h3>
+
+            <p class="chart-subtitle">
+                Comparison of safe and suspicious scan results
+            </p>
+
+            <div class="chart-container">
+                <canvas id="resultChart"></canvas>
+            </div>
+
+            <p class="chart-note">
+                This chart displays the recorded Safe and Suspicious
+                results. Other result categories are not included.
+            </p>
+
+        </div>
+
+
+        <div class="chart-card">
+
+            <h3>Scanner Usage Analysis</h3>
+
+            <p class="chart-subtitle">
+                Number of scans performed using each tool
+            </p>
+
+            <div class="chart-container">
+                <canvas id="usageChart"></canvas>
+            </div>
+
+            <p class="chart-note">
+                Compare the usage of message, URL, QR code and
+                screenshot scanning tools.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        Digital Trust & Cyber Threat Detection System
+        <br>
+        AI-powered security awareness and preliminary threat analysis
+    </div>
+
+</main>
+
+
+<!-- CHARTS -->
+
+<script>
+
+    // RESULT DOUGHNUT CHART
+
+    new Chart(document.getElementById("resultChart"), {
+
+        type: "doughnut",
+
+        data: {
+
+            labels: ["Safe", "Suspicious"],
+
+            datasets: [{
+
+                data: [
+                    {{ safe_scans|default:0 }},
+                    {{ suspicious_scans|default:0 }}
+                ],
+
+                backgroundColor: [
+                    "#20b982",
+                    "#ef6262"
+                ],
+
+                borderWidth: 4,
+                borderColor: "#ffffff",
+                hoverOffset: 10
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "68%",
+
+            plugins: {
+
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        usePointStyle: true,
+                        padding: 22
+                    }
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // HORIZONTAL BAR CHART
+
+    new Chart(document.getElementById("usageChart"), {
+
+        type: "bar",
+
+        data: {
+
+            labels: [
+                "Messages",
+                "URLs",
+                "QR Codes",
+                "Screenshots"
+            ],
+
+            datasets: [{
+
+                label: "Number of Scans",
+
+                data: [
+                    {{ message_scans|default:0 }},
+                    {{ url_scans|default:0 }},
+                    {{ qr_scans|default:0 }},
+                    {{ screenshot_scans|default:0 }}
+                ],
+
+                backgroundColor: [
+                    "#7568e8",
+                    "#39a7e8",
+                    "#a17ae8",
+                    "#efa54d"
+                ],
+
+                borderRadius: 8,
+                barThickness: 24
+
+            }]
+
+        },
+
+        options: {
+
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+
+            plugins: {
+
+                legend: {
+                    display: false
+                }
+
+            },
+
+            scales: {
+
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                },
+
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // RESTORE SAVED APPEARANCE SETTINGS
+
+    function applySavedTheme() {
+
+        const savedSettings = localStorage.getItem(
+            "digitalTrustSettings"
+        );
+
+        if (!savedSettings) return;
+
+        try {
+
+            const settings = JSON.parse(savedSettings);
+            const root = document.documentElement;
+
+            if (settings.background) {
+                root.style.setProperty(
+                    "--background",
+                    settings.background
+                );
+            }
+
+            if (settings.surface) {
+                root.style.setProperty(
+                    "--surface",
+                    settings.surface
+                );
+            }
+
+            if (settings.text) {
+                root.style.setProperty(
+                    "--text",
+                    settings.text
+                );
+            }
+
+            if (settings.primary) {
+                root.style.setProperty(
+                    "--primary",
+                    settings.primary
+                );
+            }
+
+        } catch (error) {
+            console.error("Could not load saved theme settings.");
+        }
+
+    }
+
+    applySavedTheme();
+
+</script>
+
+</body>
+</html>

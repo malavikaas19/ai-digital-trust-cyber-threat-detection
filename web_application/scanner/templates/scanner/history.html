@@ -1,0 +1,937 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan History | Digital Trust</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #172033;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: #111827;
+            color: white;
+            padding: 28px 18px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 19px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            padding-left: 10px;
+        }
+
+        .brand span {
+            color: #818cf8;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 22px 10px 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 14px;
+            margin-bottom: 7px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #29334b;
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #818cf8;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            padding: 30px 35px;
+            min-width: 0;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            gap: 15px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            margin-bottom: 7px;
+        }
+
+        .page-heading p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #172033;
+            background: white;
+            padding: 9px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            font-size: 14px;
+        }
+
+        .profile-avatar {
+            width: 34px;
+            height: 34px;
+            background: #e0e7ff;
+            color: #4338ca;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        /* SUMMARY CARDS */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 22px;
+            border-radius: 13px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.035);
+            border: 1px solid #edf0f5;
+        }
+
+        .summary-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .summary-top p {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .summary-icon {
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 9px 11px;
+            border-radius: 9px;
+        }
+
+        .summary-card h2 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .summary-card small {
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        /* HISTORY SECTION */
+        .history-section {
+            background: white;
+            border-radius: 14px;
+            padding: 25px;
+            border: 1px solid #edf0f5;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.035);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+        }
+
+        .section-header h2 {
+            font-size: 19px;
+        }
+
+        .section-header p {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filters input,
+        .filters select {
+            padding: 11px 13px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            outline: none;
+            font-size: 13px;
+            background: white;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            border-color: #6366f1;
+        }
+
+        .clear-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 11px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .clear-btn:hover {
+            background: #fecaca;
+        }
+
+        /* TABLE */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 12px;
+            color: #6b7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f0f1f5;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: #fafbff;
+        }
+
+        .input-cell {
+            max-width: 260px;
+            overflow-wrap: anywhere;
+            color: #374151;
+        }
+
+        .type-badge,
+        .result-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .type-message {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .type-url {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .type-qr {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        .type-screenshot {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .type-other {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+
+        .result-safe {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .result-suspicious {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .result-unknown {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .delete-btn {
+            background: #fff1f2;
+            color: #e11d48;
+            border: none;
+            padding: 8px 11px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #ffe4e6;
+        }
+
+        .detail-link {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .detail-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 55px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state h3 {
+            color: #172033;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+            margin-bottom: 22px;
+        }
+
+        .scan-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .scan-link {
+            background: #4f46e5;
+            color: white;
+            text-decoration: none;
+            padding: 11px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .scan-link:hover {
+            background: #4338ca;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 35px;
+            color: #9ca3af;
+            display: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1250px) {
+            .summary-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 1100px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 750px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .brand {
+                margin-bottom: 15px;
+            }
+
+            .nav-title {
+                display: none;
+            }
+
+            .nav-link {
+                display: inline-flex;
+                margin: 3px;
+                padding: 10px;
+            }
+
+            .main-content {
+                padding: 22px 15px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+            }
+
+            .page-heading h1 {
+                font-size: 22px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .history-section {
+                padding: 15px;
+            }
+
+            .filters {
+                width: 100%;
+            }
+
+            .filters input,
+            .filters select {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-link span.profile-name {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            Digital<span>Trust</span>
+        </div>
+
+        <div class="nav-title">Main Menu</div>
+
+        <a href="{% url 'home' %}" class="nav-link">
+            <span>▦</span> Dashboard
+        </a>
+
+        <a href="{% url 'message_scanner' %}" class="nav-link">
+            <span>✉</span> Message Scanner
+        </a>
+
+        <a href="{% url 'url_scanner' %}" class="nav-link">
+            <span>◎</span> URL Scanner
+        </a>
+
+        <a href="{% url 'qr_scanner' %}" class="nav-link">
+            <span>▦</span> QR Scanner
+        </a>
+
+        <a href="{% url 'screenshot_scanner' %}" class="nav-link">
+            <span>🖼️</span> Screenshot Scanner
+        </a>
+
+        <a href="{% url 'scan_history' %}" class="nav-link active">
+            <span>◷</span> Scan History
+        </a>
+
+        <div class="nav-title">Preferences</div>
+
+        <a href="{% url 'settings' %}" class="nav-link">
+            <span>⚙</span> Settings
+        </a>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+
+            <div class="page-heading">
+                <h1>Scan History</h1>
+                <p>
+                    Review and manage your message, website, QR code
+                    and screenshot security scans.
+                </p>
+            </div>
+
+            <a href="{% url 'profile' %}" class="profile-link">
+
+                <div class="profile-avatar">
+                    {{ request.user.username|first|upper }}
+                </div>
+
+                <span class="profile-name">
+                    {{ request.user.username }}
+                </span>
+
+            </a>
+
+        </div>
+
+
+        <!-- SUMMARY CARDS -->
+        <div class="summary-grid">
+
+            <div class="summary-card">
+                <div class="summary-top">
+                    <p>Total Scan Records</p>
+                    <span class="summary-icon">▤</span>
+                </div>
+                <h2>{{ history|length }}</h2>
+                <small>All recorded scans</small>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-top">
+                    <p>Message Scans</p>
+                    <span class="summary-icon">✉</span>
+                </div>
+                <h2 id="messageCount">0</h2>
+                <small>Message security checks</small>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-top">
+                    <p>URL Scans</p>
+                    <span class="summary-icon">◎</span>
+                </div>
+                <h2 id="urlCount">0</h2>
+                <small>Website security checks</small>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-top">
+                    <p>QR Scans</p>
+                    <span class="summary-icon">▦</span>
+                </div>
+                <h2 id="qrCount">0</h2>
+                <small>QR code security analyses</small>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-top">
+                    <p>Screenshot Scans</p>
+                    <span class="summary-icon">🖼️</span>
+                </div>
+                <h2 id="screenshotCount">0</h2>
+                <small>Screenshot security analyses</small>
+            </div>
+
+        </div>
+
+
+        <!-- HISTORY TABLE -->
+        <section class="history-section">
+
+            <div class="section-header">
+
+                <div>
+                    <h2>All Scan Records</h2>
+                    <p>Search, filter and delete your previous scans.</p>
+                </div>
+
+                <div class="filters">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search scans..."
+                        oninput="filterHistory()"
+                    >
+
+                    <select id="typeFilter" onchange="filterHistory()">
+                        <option value="all">All Scan Types</option>
+                        <option value="message">Message Scans</option>
+                        <option value="url">URL Scans</option>
+                        <option value="qr">QR Scans</option>
+                        <option value="screenshot">Screenshot Scans</option>
+                    </select>
+
+                    <select id="resultFilter" onchange="filterHistory()">
+                        <option value="all">All Results</option>
+                        <option value="safe">Safe</option>
+                        <option value="suspicious">Suspicious</option>
+                        <option value="unknown">Other / Not Assessed</option>
+                    </select>
+
+                    {% if history %}
+                    <form
+                        method="POST"
+                        action="{% url 'clear_history' %}"
+                        onsubmit="return confirm('Are you sure you want to delete all your scan history?');"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="clear-btn">
+                            Clear All
+                        </button>
+                    </form>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            {% if history %}
+
+            <div class="table-wrapper">
+
+                <table id="historyTable">
+
+                    <thead>
+                        <tr>
+                            <th>Scan Type</th>
+                            <th>Submitted Input</th>
+                            <th>Result</th>
+                            <th>Risk Score</th>
+                            <th>Date & Time</th>
+                            <th>Report</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for scan in history %}
+
+                        <tr
+                            data-type="{% if scan.scan_type == 'MESSAGE' %}message{% elif scan.scan_type == 'URL' %}url{% elif scan.scan_type == 'QR' %}qr{% elif scan.scan_type == 'SCREENSHOT' %}screenshot{% else %}other{% endif %}"
+                            data-result="{% if scan.prediction == 'Safe' %}safe{% elif scan.prediction == 'Suspicious' %}suspicious{% else %}unknown{% endif %}"
+                        >
+
+                            <td>
+                                {% if scan.scan_type == 'MESSAGE' %}
+                                    <span class="type-badge type-message">
+                                        Message
+                                    </span>
+                                {% elif scan.scan_type == 'URL' %}
+                                    <span class="type-badge type-url">
+                                        URL
+                                    </span>
+                                {% elif scan.scan_type == 'QR' %}
+                                    <span class="type-badge type-qr">
+                                        QR Code
+                                    </span>
+                                {% elif scan.scan_type == 'SCREENSHOT' %}
+                                    <span class="type-badge type-screenshot">
+                                        Screenshot
+                                    </span>
+                                {% else %}
+                                    <span class="type-badge type-other">
+                                        {{ scan.get_scan_type_display }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="input-cell">
+                                {{ scan.submitted_input|truncatechars:65 }}
+                            </td>
+
+                            <td>
+                                {% if scan.prediction == 'Safe' %}
+                                    <span class="result-badge result-safe">
+                                        Safe
+                                    </span>
+                                {% elif scan.prediction == 'Suspicious' %}
+                                    <span class="result-badge result-suspicious">
+                                        Suspicious
+                                    </span>
+                                {% else %}
+                                    <span class="result-badge result-unknown">
+                                        {{ scan.prediction }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if scan.prediction == 'Not Assessed' %}
+                                    —
+                                {% else %}
+                                    {{ scan.risk_score|floatformat:1 }}%
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ scan.created_at|date:"d M Y" }}
+                                <br>
+                                <small style="color:#9ca3af;">
+                                    {{ scan.created_at|date:"h:i A" }}
+                                </small>
+                            </td>
+
+                            <td>
+                                <a
+                                    href="{% url 'scan_detail' scan.id %}"
+                                    class="detail-link"
+                                >
+                                    View Report
+                                </a>
+                            </td>
+
+                            <td>
+                                <form
+                                    method="POST"
+                                    action="{% url 'delete_scan' scan.id %}"
+                                    onsubmit="return confirm('Delete this scan record?');"
+                                >
+                                    {% csrf_token %}
+                                    <button type="submit" class="delete-btn">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="no-results" id="noResults">
+                No matching scan records found.
+            </div>
+
+            {% else %}
+
+            <div class="empty-state">
+
+                <h3>No Scan History Yet</h3>
+
+                <p>
+                    Your completed message, URL, QR code and screenshot
+                    scans will appear here.
+                </p>
+
+                <div class="scan-links">
+
+                    <a href="{% url 'message_scanner' %}" class="scan-link">
+                        Message Scanner
+                    </a>
+
+                    <a href="{% url 'url_scanner' %}" class="scan-link">
+                        URL Scanner
+                    </a>
+
+                    <a href="{% url 'qr_scanner' %}" class="scan-link">
+                        QR Scanner
+                    </a>
+
+                    <a href="{% url 'screenshot_scanner' %}" class="scan-link">
+                        Screenshot Scanner
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script>
+
+    // UPDATE SUMMARY COUNTS
+
+    function updateSummaryCounts() {
+
+        const rows = document.querySelectorAll(
+            "#historyTable tbody tr"
+        );
+
+        let messages = 0;
+        let urls = 0;
+        let qrs = 0;
+        let screenshots = 0;
+
+        rows.forEach(row => {
+
+            if (row.dataset.type === "message") {
+                messages++;
+            }
+
+            if (row.dataset.type === "url") {
+                urls++;
+            }
+
+            if (row.dataset.type === "qr") {
+                qrs++;
+            }
+
+            if (row.dataset.type === "screenshot") {
+                screenshots++;
+            }
+
+        });
+
+        document.getElementById("messageCount").textContent = messages;
+        document.getElementById("urlCount").textContent = urls;
+        document.getElementById("qrCount").textContent = qrs;
+        document.getElementById("screenshotCount").textContent = screenshots;
+
+    }
+
+
+    // SEARCH AND FILTER HISTORY
+
+    function filterHistory() {
+
+        const searchInput = document
+            .getElementById("searchInput")
+            .value
+            .toLowerCase();
+
+        const typeFilter = document
+            .getElementById("typeFilter")
+            .value;
+
+        const resultFilter = document
+            .getElementById("resultFilter")
+            .value;
+
+        const rows = document.querySelectorAll(
+            "#historyTable tbody tr"
+        );
+
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+
+            const rowText = row.textContent.toLowerCase();
+
+            const rowType = row.dataset.type;
+            const rowResult = row.dataset.result;
+
+            const matchesSearch = rowText.includes(searchInput);
+
+            const matchesType =
+                typeFilter === "all" ||
+                rowType === typeFilter;
+
+            const matchesResult =
+                resultFilter === "all" ||
+                rowResult === resultFilter;
+
+            if (
+                matchesSearch &&
+                matchesType &&
+                matchesResult
+            ) {
+
+                row.style.display = "";
+                visibleCount++;
+
+            } else {
+
+                row.style.display = "none";
+
+            }
+
+        });
+
+        const noResults = document.getElementById("noResults");
+
+        if (noResults) {
+            noResults.style.display =
+                visibleCount === 0 ? "block" : "none";
+        }
+
+    }
+
+
+    // INITIALIZE
+
+    updateSummaryCounts();
+
+</script>
+
+</body>
+</html>

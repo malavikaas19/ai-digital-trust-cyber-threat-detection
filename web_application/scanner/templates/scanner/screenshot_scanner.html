@@ -1,0 +1,689 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot Scanner | Digital Trust</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fb;
+            color: #1e293b;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #101c35;
+            color: white;
+            padding: 28px 18px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 21px;
+            font-weight: 700;
+            margin-bottom: 38px;
+        }
+
+        .brand span {
+            color: #60a5fa;
+        }
+
+        .nav-title {
+            color: #94a3b8;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin: 25px 12px 12px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 13px 14px;
+            margin: 5px 0;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #243b60;
+            color: white;
+        }
+
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 75px;
+            background: white;
+            border-bottom: 1px solid #e5eaf1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 35px;
+        }
+
+        .topbar h3 {
+            font-size: 17px;
+        }
+
+        .profile {
+            text-decoration: none;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .content {
+            max-width: 1150px;
+            margin: auto;
+            padding: 35px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+            font-size: 28px;
+            margin-bottom: 9px;
+        }
+
+        .heading p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .scanner-card,
+        .result-card {
+            background: white;
+            border: 1px solid #e5eaf1;
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.04);
+            margin-bottom: 25px;
+        }
+
+        .scanner-card h2,
+        .result-card h2 {
+            font-size: 19px;
+            margin-bottom: 10px;
+        }
+
+        .description {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 22px;
+            line-height: 1.6;
+        }
+
+        .upload-area {
+            border: 2px dashed #a9bfdc;
+            background: #f8fbff;
+            border-radius: 12px;
+            padding: 38px 20px;
+            text-align: center;
+        }
+
+        .upload-icon {
+            font-size: 42px;
+            margin-bottom: 13px;
+        }
+
+        .upload-area h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        .upload-area p {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 18px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .choose-btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .choose-btn:hover {
+            background: #1d4ed8;
+        }
+
+        #previewContainer {
+            display: none;
+            margin-top: 22px;
+            text-align: center;
+        }
+
+        #preview {
+            max-width: 100%;
+            max-height: 350px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        #fileName {
+            color: #475569;
+            font-size: 13px;
+            margin-top: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #0f766e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 22px;
+        }
+
+        .submit-btn:hover {
+            background: #115e59;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error {
+            background: #fff1f2;
+            color: #be123c;
+            border: 1px solid #fecdd3;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .risk-badge {
+            padding: 9px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .suspicious {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .review {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .neutral {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .metric {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+        }
+
+        .metric-label {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .metric-value {
+            font-size: 29px;
+            font-weight: 700;
+            margin-top: 7px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            margin-bottom: 13px;
+        }
+
+        .summary-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .reason-list {
+            padding-left: 22px;
+            margin-bottom: 22px;
+        }
+
+        .reason-list li {
+            margin-bottom: 11px;
+            line-height: 1.5;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .recommendation {
+            background: #eff6ff;
+            border-left: 4px solid #2563eb;
+            padding: 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            font-size: 14px;
+            color: #1e40af;
+        }
+
+        .method-box {
+            background: #f1f5f9;
+            border-radius: 9px;
+            padding: 15px;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .notice {
+            background: #fff7ed;
+            color: #9a3412;
+            padding: 15px;
+            border-radius: 9px;
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        @media(max-width: 850px) {
+            .sidebar {
+                width: 190px;
+            }
+
+            .content {
+                padding: 22px;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .sidebar {
+                display: none;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .scanner-card,
+            .result-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="brand">Digital <span>Trust</span></div>
+
+        <div class="nav-title">Main Menu</div>
+
+        <a href="{% url 'home' %}" class="nav-link">Dashboard</a>
+        <a href="{% url 'message_scanner' %}" class="nav-link">Message Scanner</a>
+        <a href="{% url 'url_scanner' %}" class="nav-link">URL Scanner</a>
+        <a href="{% url 'qr_scanner' %}" class="nav-link">QR Scanner</a>
+        <a href="{% url 'screenshot_scanner' %}" class="nav-link active">Screenshot Scanner</a>
+
+        <div class="nav-title">Records</div>
+
+        <a href="{% url 'scan_history' %}" class="nav-link">Scan History</a>
+        <a href="{% url 'settings' %}" class="nav-link">Settings</a>
+
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <h3>Screenshot Security Analysis</h3>
+            <a href="{% url 'profile' %}" class="profile">
+                {{ request.user.username }}
+            </a>
+        </header>
+
+        <section class="content">
+
+            <div class="heading">
+                <h1>Screenshot-Based Phishing Detection</h1>
+                <p>
+                    Upload a screenshot of a suspicious website or login page.
+                    The analysis engine checks text-based indicators for
+                    potential phishing warning signs.
+                </p>
+            </div>
+
+            {% if error %}
+                <div class="error">{{ error }}</div>
+            {% endif %}
+
+            <div class="scanner-card">
+
+                <h2>Upload Website Screenshot</h2>
+
+                <p class="description">
+                    Supported formats: PNG, JPG and JPEG.
+                    Maximum file size: 5 MB.
+                </p>
+
+                <form method="POST"
+                      enctype="multipart/form-data"
+                      id="screenshotForm">
+
+                    {% csrf_token %}
+
+                    <div class="upload-area">
+
+                        <div class="upload-icon">🖼️</div>
+
+                        <h3>Select a screenshot to analyse</h3>
+
+                        <p>
+                            Choose a screenshot from your device.
+                            The image will be analysed without opening the website.
+                        </p>
+
+                        <label for="screenshot" class="choose-btn">
+                            Choose Image
+                        </label>
+
+                        <input
+                            type="file"
+                            name="screenshot"
+                            id="screenshot"
+                            accept=".png,.jpg,.jpeg,image/png,image/jpeg"
+                            required
+                        >
+
+                        <div id="previewContainer">
+
+                            <img id="preview" alt="Screenshot preview">
+
+                            <p id="fileName"></p>
+
+                        </div>
+
+                    </div>
+
+                    <button type="submit"
+                            class="submit-btn"
+                            id="submitButton">
+
+                        Analyse Screenshot
+
+                    </button>
+
+                </form>
+
+            </div>
+
+            {% if result %}
+
+            <div class="result-card">
+
+                <div class="result-header">
+
+                    <h2>Screenshot Analysis Report</h2>
+
+                    <span class="risk-badge
+                        {% if result.label == 'Suspicious' %}
+                            suspicious
+                        {% elif result.label == 'Needs Review' %}
+                            review
+                        {% else %}
+                            neutral
+                        {% endif %}">
+
+                        {{ result.label }}
+
+                    </span>
+
+                </div>
+
+                <div class="metric">
+
+                    <div class="metric-label">
+                        Heuristic Risk Score
+                    </div>
+
+                    <div class="metric-value">
+                        {{ result.risk_score }}%
+                    </div>
+
+                </div>
+
+                <h3 class="section-title">
+                    Threat Intelligence Summary
+                </h3>
+
+                <div class="summary-box">
+
+                    {% if result.label == 'Suspicious' %}
+
+                        The screenshot contains multiple warning signs
+                        associated with potentially deceptive website
+                        content. Exercise caution before interacting
+                        with the displayed website.
+
+                    {% elif result.label == 'Needs Review' %}
+
+                        The screenshot contains some warning signs
+                        that require additional verification. Review
+                        the detected indicators before trusting the
+                        displayed website.
+
+                    {% else %}
+
+                        No strong phishing warning signs were detected
+                        by the current checks. This does not establish
+                        that the screenshot or website is genuine.
+
+                    {% endif %}
+
+                </div>
+
+                <h3 class="section-title">
+                    Detected Warning Signs
+                </h3>
+
+                <ul class="reason-list">
+
+                    {% for reason in result.reasons %}
+                        <li>{{ reason }}</li>
+                    {% endfor %}
+
+                </ul>
+
+                <h3 class="section-title">
+                    Security Recommendation
+                </h3>
+
+                <div class="recommendation">
+
+                    {% if result.label == 'Suspicious' %}
+
+                        Avoid entering passwords, OTPs or financial
+                        information. Verify the website through its
+                        official address or contact channel.
+
+                    {% elif result.label == 'Needs Review' %}
+
+                        Do not share sensitive information until the
+                        website's identity and authenticity have been
+                        independently verified.
+
+                    {% else %}
+
+                        Continue to exercise caution. Check the website
+                        address and verify its identity before sharing
+                        sensitive information.
+
+                    {% endif %}
+
+                </div>
+
+                <h3 class="section-title">
+                    Analysis Method
+                </h3>
+
+                <div class="method-box">
+                    <strong>Text recognition:</strong> Tesseract OCR<br>
+                    <strong>Detection technique:</strong> Rule-based
+                    phishing indicator analysis<br>
+                    <strong>Visual processing:</strong> OpenCV image
+                    preprocessing<br>
+                    <strong>Result:</strong> Heuristic risk assessment
+                </div>
+
+                <div class="notice">
+                    <strong>Important:</strong>
+                    This is a preliminary heuristic assessment, not a
+                    verified phishing classification. A low risk score
+                    does not guarantee that a website is safe.
+                    Always verify website addresses independently.
+                </div>
+
+                
+
+            </div>
+
+            {% endif %}
+
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+
+const screenshotInput = document.getElementById("screenshot");
+const previewContainer = document.getElementById("previewContainer");
+const preview = document.getElementById("preview");
+const fileName = document.getElementById("fileName");
+const form = document.getElementById("screenshotForm");
+const submitButton = document.getElementById("submitButton");
+
+screenshotInput.addEventListener("change", function() {
+
+    const file = this.files[0];
+
+    if (!file) {
+        previewContainer.style.display = "none";
+        preview.removeAttribute("src");
+        return;
+    }
+
+    const allowedTypes = ["image/png", "image/jpeg"];
+
+    if (!allowedTypes.includes(file.type)) {
+        alert("Please upload a PNG or JPG image.");
+        this.value = "";
+        previewContainer.style.display = "none";
+        preview.removeAttribute("src");
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        alert("Image size must not exceed 5 MB.");
+        this.value = "";
+        previewContainer.style.display = "none";
+        preview.removeAttribute("src");
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+        preview.src = event.target.result;
+        previewContainer.style.display = "block";
+        fileName.textContent = file.name;
+    };
+
+    reader.readAsDataURL(file);
+
+});
+
+form.addEventListener("submit", function(event) {
+
+    if (!screenshotInput.files.length) {
+        event.preventDefault();
+        alert("Please select a screenshot first.");
+        return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Analysing Screenshot...";
+
+});
+
+</script>
+
+</body>
+</html>

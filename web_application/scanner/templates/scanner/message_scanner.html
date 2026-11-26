@@ -1,0 +1,970 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Security Scanner | Digital Trust</title>
+
+    <style>
+        :root {
+            --bg: #f4f6fb;
+            --surface: #ffffff;
+            --text: #172033;
+            --muted: #718096;
+            --primary: #4f46e5;
+            --border: #e7eaf1;
+            --sidebar: #111827;
+            --green: #059669;
+            --red: #dc2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar);
+            color: white;
+            padding: 28px 18px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            font-size: 19px;
+            font-weight: 800;
+            padding: 5px 12px 35px;
+            letter-spacing: -0.5px;
+        }
+
+        .brand span {
+            color: #818cf8;
+        }
+
+        .nav-label {
+            color: #8993a5;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            padding: 0 12px;
+            margin-bottom: 13px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            margin-bottom: 7px;
+            color: #cbd5e1;
+            text-decoration: none;
+            border-radius: 9px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #29334b;
+            color: white;
+        }
+
+        .nav-link.active {
+            border-left: 3px solid #818cf8;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            border-top: 1px solid #30394a;
+            padding-top: 18px;
+        }
+
+        /* Main content */
+
+        .main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topbar {
+            height: 76px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 38px;
+        }
+
+        .topbar h2 {
+            font-size: 17px;
+            font-weight: 700;
+        }
+
+        .profile-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .avatar {
+            width: 37px;
+            height: 37px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            color: #4338ca;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+        }
+
+        .content {
+            max-width: 1100px;
+            margin: auto;
+            padding: 38px;
+        }
+
+        .page-heading {
+            margin-bottom: 28px;
+        }
+
+        .page-heading h1 {
+            font-size: 27px;
+            letter-spacing: -0.7px;
+            margin-bottom: 9px;
+        }
+
+        .page-heading p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .scanner-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(250px, 0.8fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 27px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.035);
+        }
+
+        .card-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .card-icon {
+            width: 43px;
+            height: 43px;
+            display: grid;
+            place-items: center;
+            background: #eef2ff;
+            color: var(--primary);
+            border-radius: 11px;
+            font-size: 21px;
+        }
+
+        .card-heading h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .card-heading p {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 220px;
+            resize: vertical;
+            border: 1px solid #dce1eb;
+            border-radius: 10px;
+            padding: 16px;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text);
+            outline: none;
+            transition: 0.2s;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.10);
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 9px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 11px;
+            margin-top: 22px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 9px;
+            padding: 13px 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: wait;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f1f3f8;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Security Intelligence */
+
+        .info-card {
+            background: #172554;
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .info-card h3 {
+            font-size: 17px;
+            margin-bottom: 12px;
+        }
+
+        .info-card > p {
+            color: #c7d2fe;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 23px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+            margin-bottom: 21px;
+            font-size: 12px;
+            line-height: 1.7;
+            color: #e0e7ff;
+        }
+
+        .info-number {
+            min-width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: rgba(165, 180, 252, 0.15);
+            color: #a5b4fc;
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .info-item strong {
+            display: inline-block;
+            color: white;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .notice {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.09);
+            border: 1px solid rgba(255,255,255,0.10);
+            border-radius: 10px;
+            color: #c7d2fe;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .notice strong {
+            display: block;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        /* Results */
+
+        .result-card {
+            margin-top: 25px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 27px;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 23px;
+        }
+
+        .result-header h3 {
+            font-size: 18px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .status.safe {
+            color: #047857;
+            background: #d1fae5;
+        }
+
+        .status.suspicious {
+            color: #b91c1c;
+            background: #fee2e2;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 25px;
+        }
+
+        .metric {
+            background: #f8f9fc;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 18px;
+        }
+
+        .metric p {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .metric h2 {
+            font-size: 25px;
+            letter-spacing: -0.5px;
+        }
+
+        .metric small {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .progress-section {
+            margin-bottom: 22px;
+        }
+
+        .progress-heading {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 9px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .progress-track {
+            height: 9px;
+            background: #e9edf4;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: var(--primary);
+        }
+
+        .risk-fill {
+            background: var(--red);
+        }
+
+        .reasons {
+            margin-top: 24px;
+            border-top: 1px solid var(--border);
+            padding-top: 21px;
+        }
+
+        .reasons h4 {
+            font-size: 14px;
+            margin-bottom: 13px;
+        }
+
+        .reason-item {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 9px;
+            overflow-wrap: anywhere;
+        }
+
+        .model-note {
+            margin-top: 17px;
+            padding: 13px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 14px 16px;
+            border-radius: 9px;
+            color: #b91c1c;
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            font-size: 13px;
+        }
+
+        .footer {
+            text-align: center;
+            color: var(--muted);
+            font-size: 11px;
+            padding: 30px 10px;
+        }
+
+        @media(max-width: 900px) {
+            .sidebar {
+                width: 205px;
+            }
+
+            .scanner-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 650px) {
+            .sidebar {
+                display: none;
+            }
+
+            .content {
+                padding: 22px 15px;
+            }
+
+            .topbar {
+                padding: 0 17px;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 19px;
+            }
+
+            .page-heading h1 {
+                font-size: 23px;
+            }
+
+            .topbar h2 {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="brand">Digital<span>Trust.</span></div>
+
+        <div class="nav-label">WORKSPACE</div>
+
+        <a href="{% url 'home' %}" class="nav-link">
+            <span>▦</span> Dashboard
+        </a>
+
+        <a href="{% url 'message_scanner' %}" class="nav-link active">
+            <span>✉</span> Message Scanner
+        </a>
+
+        <a href="{% url 'url_scanner' %}" class="nav-link">
+            <span>◎</span> URL Scanner
+        </a>
+
+        <a href="{% url 'qr_scanner' %}" class="nav-link">
+    <span>▦</span> QR Scanner
+</a>
+
+        <a href="{% url 'scan_history' %}" class="nav-link">
+            <span>◷</span> Scan History
+        </a>
+
+        <div class="sidebar-bottom">
+            <a href="{% url 'settings' %}" class="nav-link">
+                <span>⚙</span> Settings
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- Main Area -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <h2>Message Security Scanner</h2>
+
+            <a href="{% url 'profile' %}" class="profile-link">
+
+                <span class="avatar">
+                    {{ request.user.username|first|upper }}
+                </span>
+
+                <span>{{ request.user.username }}</span>
+
+            </a>
+
+        </header>
+
+        <section class="content">
+
+            <div class="page-heading">
+
+                <h1>Message Threat Analysis</h1>
+
+                <p>
+                    Analyze suspicious messages and identify potential
+                    phishing attempts using AI-powered text analysis.
+                </p>
+
+            </div>
+
+            <div class="scanner-grid">
+
+                <!-- Message Input -->
+
+                <section class="card">
+
+                    <div class="card-heading">
+
+                        <div class="card-icon">✉</div>
+
+                        <div>
+                            <h3>Analyze a Message</h3>
+                            <p>Paste the message you want to examine.</p>
+                        </div>
+
+                    </div>
+
+                    <form method="POST" action="{% url 'message_scanner' %}">
+
+                        {% csrf_token %}
+
+                        <label for="message">Message Content</label>
+
+                        <textarea
+                            id="message"
+                            name="message"
+                            placeholder="Paste your suspicious email, SMS, or message here..."
+                            required
+                        >{{ request.POST.message|default:'' }}</textarea>
+
+                        <div class="input-footer">
+
+                            <span>Keep personal passwords and OTPs private.</span>
+
+                            <span id="charCount">0 characters</span>
+
+                        </div>
+
+                        <div class="actions">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                id="scanButton"
+                            >
+                                Analyze Message →
+                            </button>
+
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                onclick="clearMessage()"
+                            >
+                                Clear
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    {% if error %}
+                        <div class="error">
+                            {{ error }}
+                        </div>
+                    {% endif %}
+
+                </section>
+
+                <!-- Security Intelligence Panel -->
+
+                <aside class="info-card">
+
+                    <h3>Security Intelligence</h3>
+
+                    <p>
+                        Stay informed and make safer decisions when
+                        handling unexpected digital messages.
+                    </p>
+
+                    <div class="info-item">
+
+                        <span class="info-number">01</span>
+
+                        <div>
+                            <strong>Verify the Sender</strong><br>
+                            Check the sender's identity before trusting
+                            unexpected messages.
+                        </div>
+
+                    </div>
+
+                    <div class="info-item">
+
+                        <span class="info-number">02</span>
+
+                        <div>
+                            <strong>Inspect Links Carefully</strong><br>
+                            Avoid opening unfamiliar links or unexpected
+                            attachments.
+                        </div>
+
+                    </div>
+
+                    <div class="info-item">
+
+                        <span class="info-number">03</span>
+
+                        <div>
+                            <strong>Protect Your Credentials</strong><br>
+                            Never share passwords, PINs or OTPs through
+                            messages.
+                        </div>
+
+                    </div>
+
+                    <div class="info-item">
+
+                        <span class="info-number">04</span>
+
+                        <div>
+                            <strong>Take Action on Warnings</strong><br>
+                            Verify suspicious requests through the
+                            organisation's official website or contact channel.
+                        </div>
+
+                    </div>
+
+                    <div class="notice">
+
+                        <strong>Security Reminder</strong>
+
+                        A scan result is an AI-generated estimate.
+                        Always verify important requests independently.
+
+                    </div>
+
+                </aside>
+
+            </div>
+
+            <!-- Scan Results -->
+
+            {% if result %}
+
+            <section class="result-card">
+
+                <div class="result-header">
+
+                    <h3>Analysis Results</h3>
+
+                    {% if result.label == "Safe" %}
+
+                        <span class="status safe">
+                            ✓ {{ result.label }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="status suspicious">
+                            ⚠ {{ result.label }}
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- Metrics -->
+
+                <div class="metrics">
+
+                    <div class="metric">
+
+                        <p>Digital Trust Score</p>
+
+                        <h2>
+                            {{ result.trust_score }}<small> / 100</small>
+                        </h2>
+
+                        <small>{{ result.risk_level }}</small>
+
+                    </div>
+
+                    <div class="metric">
+
+                        <p>Suspicious Probability</p>
+
+                        <h2>
+                            {% widthratio result.suspicious_probability 1 100 %}%
+                        </h2>
+
+                        <small>AI-estimated message risk</small>
+
+                    </div>
+
+                    <div class="metric">
+
+                        <p>Model Confidence</p>
+
+                        <h2>
+                            {% widthratio result.confidence 1 100 %}%
+                        </h2>
+
+                        <small>Model prediction confidence</small>
+
+                    </div>
+
+                </div>
+
+                <!-- Trust Score Progress -->
+
+                <div class="progress-section">
+
+                    <div class="progress-heading">
+
+                        <span>Digital Trust Score</span>
+
+                        <span>{{ result.trust_score }} / 100</span>
+
+                    </div>
+
+                    <div class="progress-track">
+
+                        <div
+                            class="progress-fill"
+                            style="width: {{ result.trust_score }}%;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <!-- Suspicious Probability Progress -->
+
+                <div class="progress-section">
+
+                    <div class="progress-heading">
+
+                        <span>Suspicious Probability</span>
+
+                        <span>
+                            {% widthratio result.suspicious_probability 1 100 %}%
+                        </span>
+
+                    </div>
+
+                    <div class="progress-track">
+
+                        <div
+                            class="progress-fill risk-fill"
+                            style="width: {% widthratio result.suspicious_probability 1 100 %}%;"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                <!-- Detection Explanation -->
+
+                <div class="reasons">
+
+                    <h4>Detection Explanation</h4>
+
+                    {% for reason in result.reasons %}
+
+                        <div class="reason-item">
+                            {{ reason }}
+                        </div>
+
+                    {% empty %}
+
+                        <p>No additional detection explanation was returned.</p>
+
+                    {% endfor %}
+
+                </div>
+
+                {% if result.message %}
+
+                    <div class="model-note">
+
+                        <strong>Trust Score Explanation:</strong>
+
+                        {{ result.message }}
+
+                    </div>
+
+                {% endif %}
+
+                {% if result.model_note %}
+
+                    <div class="model-note">
+
+                        <strong>Model Information:</strong>
+
+                        {{ result.model_note }}
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+            {% endif %}
+
+            <div class="footer">
+                AI-Powered Digital Trust and Cyber Threat Detection System
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script>
+
+    const messageInput = document.getElementById("message");
+    const charCount = document.getElementById("charCount");
+
+    function updateCount() {
+
+        charCount.textContent =
+            messageInput.value.length + " characters";
+
+    }
+
+    messageInput.addEventListener("input", updateCount);
+
+    updateCount();
+
+    function clearMessage() {
+
+        messageInput.value = "";
+
+        updateCount();
+
+        messageInput.focus();
+
+    }
+
+    document.querySelector("form").addEventListener("submit", function() {
+
+        const button = document.getElementById("scanButton");
+
+        button.textContent = "Analyzing...";
+
+        button.disabled = true;
+
+    });
+
+</script>
+
+</body>
+</html>

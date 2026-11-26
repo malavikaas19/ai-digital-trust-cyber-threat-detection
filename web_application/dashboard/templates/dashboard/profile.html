@@ -1,0 +1,259 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Profile | Digital Trust</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background: #080f20;
+    font-family: Arial, sans-serif;
+    color: white;
+    padding: 35px 15px;
+}
+
+.container {
+    max-width: 850px;
+    margin: auto;
+    background: #111e36;
+    border: 1px solid #263b61;
+    border-radius: 18px;
+    overflow: hidden;
+}
+
+.header {
+    padding: 30px;
+    background: linear-gradient(120deg, #102b50, #174b83);
+}
+
+.header h1 {
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #c2d6f2;
+    font-size: 14px;
+}
+
+.content {
+    padding: 35px;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid #304663;
+    margin-bottom: 30px;
+}
+
+.avatar {
+    width: 115px;
+    height: 115px;
+    border-radius: 50%;
+    border: 3px solid #269cff;
+    object-fit: cover;
+    background: #203b61;
+}
+
+.avatar-placeholder {
+    width: 115px;
+    height: 115px;
+    border-radius: 50%;
+    background: #203b61;
+    border: 3px solid #269cff;
+    display: grid;
+    place-items: center;
+    font-size: 43px;
+}
+
+.profile-info h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.profile-info p {
+    color: #9aacc8;
+    font-size: 13px;
+}
+
+.form-title {
+    font-size: 19px;
+    margin-bottom: 22px;
+}
+
+.field {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 9px;
+    color: #d9e7fa;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 13px;
+    background: #0b172c;
+    color: white;
+    border: 1px solid #304663;
+    border-radius: 8px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #269cff;
+}
+
+input[type="file"] {
+    padding: 10px;
+}
+
+.helptext {
+    display: block;
+    color: #94a9c6;
+    margin-top: 7px;
+    font-size: 12px;
+}
+
+.errorlist {
+    color: #ff8585;
+    margin: 8px 0;
+    font-size: 13px;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+
+button, .back {
+    padding: 13px 22px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+button {
+    background: linear-gradient(90deg, #087cff, #624cff);
+    color: white;
+}
+
+.back {
+    background: #263b61;
+    color: white;
+}
+
+button:hover, .back:hover {
+    opacity: 0.85;
+}
+
+@media(max-width: 550px) {
+    .content {
+        padding: 22px;
+    }
+
+    .profile-section {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>My Profile</h1>
+        <p>Manage your personal information and account picture.</p>
+    </div>
+
+    <div class="content">
+
+        <div class="profile-section">
+
+            {% if user_profile.profile_image %}
+                <img
+                    src="{{ user_profile.profile_image.url }}"
+                    class="avatar"
+                    alt="Profile picture"
+                >
+            {% else %}
+                <div class="avatar-placeholder">👤</div>
+            {% endif %}
+
+            <div class="profile-info">
+                <h2>{{ request.user.username }}</h2>
+                <p>Digital Trust Member</p>
+                <p>{{ request.user.email }}</p>
+            </div>
+
+        </div>
+
+        <h3 class="form-title">Edit Personal Information</h3>
+
+        <form method="POST" enctype="multipart/form-data">
+
+            {% csrf_token %}
+
+            {% for field in form %}
+
+                <div class="field">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small class="helptext">
+                            {{ field.help_text }}
+                        </small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <p class="errorlist">{{ error }}</p>
+                    {% endfor %}
+
+                </div>
+
+            {% endfor %}
+
+            <div class="buttons">
+                <button type="submit">Save Changes</button>
+
+                <a href="{% url 'home' %}" class="back">
+                    Back to Dashboard
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

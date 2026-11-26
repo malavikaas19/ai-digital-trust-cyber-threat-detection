@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create Account | Digital Trust</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #080f20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    color: white;
+}
+
+.main-container {
+    width: 1150px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    background: #101b32;
+    border: 1px solid #263b61;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+}
+
+/* LEFT PANEL */
+
+.left-panel {
+    padding: 55px;
+    background:
+        radial-gradient(circle at 30% 45%, #123e76 0%, transparent 42%),
+        linear-gradient(145deg, #101d38, #071225);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.brand-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #168cff, #694cff);
+    display: grid;
+    place-items: center;
+    font-size: 25px;
+}
+
+.brand h3 {
+    font-size: 17px;
+    letter-spacing: 1px;
+}
+
+.brand span {
+    display: block;
+    font-size: 10px;
+    color: #8ba6ca;
+    letter-spacing: 2px;
+    margin-top: 3px;
+}
+
+.hero-content {
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+.tag {
+    display: inline-block;
+    color: #58c5ff;
+    border: 1px solid #24568c;
+    background: #102b4d;
+    padding: 8px 13px;
+    border-radius: 20px;
+    font-size: 11px;
+    margin-bottom: 25px;
+}
+
+.hero-content h1 {
+    font-size: 42px;
+    line-height: 1.2;
+    margin-bottom: 20px;
+}
+
+.hero-content h1 span {
+    color: #36a9ff;
+}
+
+.hero-content p {
+    color: #9aacc8;
+    line-height: 1.8;
+    font-size: 14px;
+}
+
+.security-icon {
+    font-size: 105px;
+    text-align: center;
+    margin: 35px 0;
+    color: #37aaff;
+    text-shadow: 0 0 35px #087cff;
+}
+
+.security-note {
+    border: 1px solid #263e61;
+    background: rgba(15,38,69,0.7);
+    padding: 18px;
+    border-radius: 12px;
+    color: #9aacc8;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.security-note strong {
+    color: #53c3ff;
+}
+
+/* RIGHT PANEL */
+
+.right-panel {
+    padding: 45px;
+    background: linear-gradient(145deg, #14213c, #0c1529);
+}
+
+.heading {
+    margin-bottom: 25px;
+}
+
+.heading h2 {
+    font-size: 29px;
+    margin-bottom: 9px;
+}
+
+.heading p {
+    color: #91a4c2;
+    font-size: 13px;
+}
+
+form p {
+    margin-bottom: 15px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #d9e7fa;
+    font-size: 13px;
+}
+
+form input {
+    width: 100%;
+    padding: 13px;
+    background: #0b172c;
+    border: 1px solid #304663;
+    border-radius: 8px;
+    outline: none;
+    color: white;
+    font-size: 13px;
+}
+
+form input:focus {
+    border-color: #269cff;
+    box-shadow: 0 0 12px rgba(38,156,255,0.2);
+}
+
+.helptext {
+    display: block;
+    color: #8296b5;
+    font-size: 11px;
+    line-height: 1.5;
+    margin-top: 6px;
+}
+
+ul.errorlist {
+    color: #ff8585;
+    font-size: 12px;
+    padding-left: 18px;
+    margin: 5px 0;
+}
+
+.form-errors {
+    color: #ff8585;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.create-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 9px;
+    background: linear-gradient(90deg, #087cff, #624cff);
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 12px;
+}
+
+.create-btn:hover {
+    box-shadow: 0 8px 25px rgba(36,116,255,0.35);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 22px;
+    color: #91a4c2;
+    font-size: 13px;
+}
+
+.login-link a {
+    color: #45b5ff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.footer {
+    text-align: center;
+    color: #647995;
+    font-size: 11px;
+    margin-top: 25px;
+}
+
+@media(max-width: 850px) {
+    .main-container {
+        grid-template-columns: 1fr;
+    }
+
+    .left-panel {
+        padding: 35px;
+    }
+
+    .hero-content {
+        margin: 40px 0;
+    }
+
+    .hero-content h1 {
+        font-size: 32px;
+    }
+
+    .right-panel {
+        padding: 35px;
+    }
+}
+
+@media(max-width: 450px) {
+    body {
+        padding: 12px;
+    }
+
+    .left-panel, .right-panel {
+        padding: 24px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="main-container">
+
+    <!-- LEFT SIDE -->
+
+    <section class="left-panel">
+
+        <div class="brand">
+            <div class="brand-icon">🛡</div>
+
+            <div>
+                <h3>DIGITAL TRUST</h3>
+                <span>CYBER INTELLIGENCE</span>
+            </div>
+        </div>
+
+        <div class="hero-content">
+
+            <div class="tag">● JOIN OUR SECURITY PLATFORM</div>
+
+            <h1>
+                Build Your Digital Identity.
+                <span>Stay Protected.</span>
+            </h1>
+
+            <p>
+                Create your account and access intelligent
+                cybersecurity tools to analyse messages,
+                examine URLs and understand digital risks.
+            </p>
+
+            <div class="security-icon">⬡</div>
+
+            <div class="security-note">
+                <strong>YOUR SECURITY MATTERS</strong><br>
+                Your account gives you access to your
+                personal security dashboard and scan history.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- RIGHT SIDE -->
+
+    <section class="right-panel">
+
+        <div class="heading">
+            <h2>Create Your Account</h2>
+            <p>Register to get started with Digital Trust.</p>
+        </div>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="form-errors">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+
+                <p>
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small class="helptext">
+                            {{ field.help_text|safe }}
+                        </small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <span class="form-errors">
+                            {{ error }}
+                        </span>
+                    {% endfor %}
+                </p>
+
+            {% endfor %}
+
+            <button type="submit" class="create-btn">
+                Create Account →
+            </button>
+
+        </form>
+
+        <div class="login-link">
+            Already have an account?
+            <a href="{% url 'login' %}">Sign In</a>
+        </div>
+
+        <div class="footer">
+            Digital Trust | Intelligent Cybersecurity Platform
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>

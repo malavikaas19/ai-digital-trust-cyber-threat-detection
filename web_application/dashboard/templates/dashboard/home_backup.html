@@ -1,0 +1,651 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Digital Trust | Security Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3f6fc;
+            color: #172033;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111c35;
+            color: white;
+            position: fixed;
+            padding: 28px 18px;
+            top: 0;
+            left: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 21px;
+            margin-bottom: 40px;
+            color: #65b8ff;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #d4deef;
+            text-decoration: none;
+            padding: 14px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            background: #263b62;
+            color: white;
+        }
+
+        .main {
+            margin-left: 240px;
+            padding: 35px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .topbar h1 {
+            font-size: 27px;
+        }
+
+        .topbar p {
+            color: #718096;
+            margin-top: 8px;
+        }
+
+        .profile {
+            background: white;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 13px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .card p {
+            color: #718096;
+            margin-bottom: 15px;
+        }
+
+        .card h2 {
+            font-size: 30px;
+        }
+
+        .green {
+            color: #16a36a;
+        }
+
+        .red {
+            color: #e04455;
+        }
+
+        .blue {
+            color: #2878d0;
+        }
+
+        .orange {
+            color: #e58b28;
+        }
+
+        .section-title {
+            margin-bottom: 18px;
+            font-size: 21px;
+        }
+
+        .scanner-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .scanner {
+            background: white;
+            padding: 28px;
+            border-radius: 13px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+        }
+
+        .scanner h3 {
+            margin-bottom: 12px;
+        }
+
+        .scanner p {
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 22px;
+        }
+
+        .btn {
+            display: inline-block;
+            background: #246bce;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: #174f9f;
+        }
+
+        .analytics {
+            margin-top: 35px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 13px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.04);
+            min-width: 0;
+        }
+
+        .chart-card h3 {
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+
+        .activity {
+            margin-top: 30px;
+            background: white;
+            padding: 25px;
+            border-radius: 13px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            min-width: 650px;
+        }
+
+        th, td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #172554;
+            color: white;
+        }
+
+        tr:hover {
+            background: #f1f5f9;
+        }
+
+        .safe {
+            color: #16834a;
+            font-weight: bold;
+        }
+
+        .suspicious {
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        .empty {
+            color: #718096;
+            text-align: center;
+            padding: 25px;
+        }
+
+        .history-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #246bce;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @media(max-width: 1000px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 700px) {
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .cards,
+            .scanner-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                gap: 15px;
+                flex-direction: column;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <!-- Sidebar Navigation -->
+
+    <aside class="sidebar">
+
+        <h2>🛡 Digital Trust</h2>
+
+        <a href="/" class="active">Dashboard</a>
+
+        <a href="/message-scanner/">Message Scanner</a>
+
+        <a href="/url-scanner/">URL Scanner</a>
+
+        <a href="/history/">Scan History</a>
+
+        <a href="{% url 'profile' %}">My Profile</a>
+
+    </aside>
+
+
+    <main class="main">
+
+        <!-- Header -->
+
+        <div class="topbar">
+
+            <div>
+                <h1>Security Dashboard</h1>
+
+                <p>
+                    Monitor digital trust and cyber threats.
+                </p>
+            </div>
+
+            <div class="profile">
+                Welcome, {{ request.user.username }}
+            </div>
+
+        </div>
+
+
+        <!-- Dashboard Statistics -->
+
+        <div class="cards">
+
+            <div class="card">
+                <p>Total Scans</p>
+                <h2 class="blue">{{ total_scans }}</h2>
+            </div>
+
+            <div class="card">
+                <p>Message Scans</p>
+                <h2 class="blue">{{ message_scans }}</h2>
+            </div>
+
+            <div class="card">
+                <p>URL Scans</p>
+                <h2 class="blue">{{ url_scans }}</h2>
+            </div>
+
+            <div class="card">
+                <p>Safe Results</p>
+                <h2 class="green">{{ safe_scans }}</h2>
+            </div>
+
+            <div class="card">
+                <p>Suspicious Results</p>
+                <h2 class="red">{{ suspicious_scans }}</h2>
+            </div>
+
+            <div class="card">
+                <p>High-Risk Scans</p>
+                <h2 class="orange">{{ high_risk_scans }}</h2>
+            </div>
+
+        </div>
+
+
+        <!-- Security Scanners -->
+
+        <h2 class="section-title">
+            Security Scanners
+        </h2>
+
+        <div class="scanner-grid">
+
+            <div class="scanner">
+
+                <h3>📩 Message Scanner</h3>
+
+                <p>
+                    Analyse messages to identify suspicious
+                    content and potential phishing attempts.
+                </p>
+
+                <a href="/message-scanner/" class="btn">
+                    Analyse Message
+                </a>
+
+            </div>
+
+
+            <div class="scanner">
+
+                <h3>🔗 URL Scanner</h3>
+
+                <p>
+                    Check URLs for suspicious characteristics
+                    and potential malicious links.
+                </p>
+
+                <a href="/url-scanner/" class="btn">
+                    Scan URL
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- Security Analytics -->
+
+        <div class="analytics">
+
+            <h2 class="section-title">
+                Security Analytics
+            </h2>
+
+            <div class="scanner-grid">
+
+                <!-- Safe vs Suspicious Chart -->
+
+                <div class="chart-card">
+
+                    <h3>Scan Result Analysis</h3>
+
+                    <div class="chart-container">
+
+                        <canvas id="resultChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Message vs URL Chart -->
+
+                <div class="chart-card">
+
+                    <h3>Scan Type Analysis</h3>
+
+                    <div class="chart-container">
+
+                        <canvas id="typeChart"></canvas>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Recent Security Activity -->
+
+        <div class="activity">
+
+            <h2>Recent Security Activity</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Scan Type</th>
+                        <th>Submitted Input</th>
+                        <th>Prediction</th>
+                        <th>Risk Score</th>
+                        <th>Date</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for scan in recent_scans %}
+
+                    <tr>
+
+                        <td>
+                            {{ scan.get_scan_type_display }}
+                        </td>
+
+                        <td>
+                            {{ scan.submitted_input|truncatechars:40 }}
+                        </td>
+
+                        <td>
+
+                            {% if scan.prediction == "Safe" %}
+
+                                <span class="safe">Safe</span>
+
+                            {% else %}
+
+                                <span class="suspicious">
+                                    Suspicious
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ scan.risk_score|floatformat:1 }}/100
+                        </td>
+
+                        <td>
+                            {{ scan.created_at|date:"d M Y, h:i A" }}
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="5" class="empty">
+                            No scans performed yet.
+                            Start by analysing a message or URL.
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            <a href="/history/" class="history-link">
+                View All Scan History →
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <!-- Chart JavaScript -->
+
+    <script>
+
+        // Scan Result Analysis
+
+        const resultCanvas = document.getElementById("resultChart");
+
+        new Chart(resultCanvas, {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: ["Safe", "Suspicious"],
+
+                datasets: [{
+
+                    data: [
+                        {{ safe_scans }},
+                        {{ suspicious_scans }}
+                    ],
+
+                    backgroundColor: [
+                        "#16a36a",
+                        "#e04455"
+                    ],
+
+                    borderWidth: 2,
+                    borderColor: "#ffffff"
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        position: "bottom"
+                    }
+
+                }
+
+            }
+
+        });
+
+
+        // Scan Type Analysis
+
+        const typeCanvas = document.getElementById("typeChart");
+
+        new Chart(typeCanvas, {
+
+            type: "bar",
+
+            data: {
+
+                labels: [
+                    "Message Scans",
+                    "URL Scans"
+                ],
+
+                datasets: [{
+
+                    label: "Number of Scans",
+
+                    data: [
+                        {{ message_scans }},
+                        {{ url_scans }}
+                    ],
+
+                    backgroundColor: [
+                        "#2878d0",
+                        "#e58b28"
+                    ],
+
+                    borderRadius: 8
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+                            precision: 0
+                        }
+
+                    }
+
+                },
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                }
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>
